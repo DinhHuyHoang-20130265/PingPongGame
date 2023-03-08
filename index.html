@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ping pong game</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <style>
+        .game {
+            width: 1000px;
+            border: 2px solid #4e555b;
+            height: 600px;
+            margin: auto;
+            background: lightblue;
+            position: relative;
+        }
+
+        #p1-paddle, #p2-paddle {
+            position: absolute;
+            width: 10px;
+            height: 100px;
+            background-color: white;
+            border: 1px solid gray;
+            border-radius: 5px;
+        }
+
+        #p1-paddle {
+            left: 0;
+            top: calc(50% - 50px);
+        }
+
+        #p2-paddle {
+            right: 0;
+            top: calc(50% - 50px);
+        }
+
+        #ball {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            top: 50%;
+            left: 50%;
+            border-radius: 50%;
+        }
+
+        .choose {
+            position: absolute;
+            top: calc(40% - 50px);
+            left: 44%;
+        }
+
+        .choose_option {
+            position: absolute;
+            top: calc(40% - 50px);
+            left: 44%;
+        }
+
+        .button {
+            width: 100px;
+            text-align: center;
+            height: fit-content;
+            background: wheat;
+            border: 2px solid;
+            font-size: 16px;
+            margin: 10px auto auto;
+            border-radius: 5%;
+            cursor: pointer;
+        }
+
+        .button p {
+            margin: 5px;
+        }
+
+        h4 {
+            text-align: center;
+        }
+
+        .boundary {
+            width: 0;
+            height: 100%;
+            border-left: 5px dashed #5a6268;
+            left: calc(50% - 2.5px);
+            position: absolute;
+        }
+
+        .score {
+            font-family: Arial, sans-serif;
+            font-size: 100px;
+            position: absolute;
+            color: rgba(193, 246, 230, 0.75);
+        }
+
+        .p1-score {
+            left: 22.5%;
+        }
+
+        .p2-score {
+            left: 72.5%;
+        }
+    </style>
+</head>
+<body>
+<div class="container main">
+    <div class="game">
+        <div class="choose">
+            <h4>Choose Mode</h4>
+            <div class="button" id="mode0" onclick="mode0()"><p>2 Players</p></div>
+            <div class="button" id="mode1" onclick="mode1()"><p>Clear barricade</p></div>
+        </div>
+    </div>
+</div>
+
+
+<script src="js/jquery-3.6.3.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script>
+    let screenSize = {
+        width: parseInt($(".game").css("width").substring(0, $(".game").css("width").indexOf('px'))),
+        height: parseInt($(".game").css("height").substring(0, $(".game").css("height").indexOf('px')))
+    }
+    let moveInt;
+    let start;
+
+    // quay lại menu chính
+    function go_back() {
+        $(".container.main .choose_option").remove()
+        $(".game").css('opacity', '1')
+        $(".game").empty().append(`  <div class="choose">
+            <h4>Choose Mode</h4>
+            <div class="button" id="mode0" onclick="mode0()"><p>2 Players</p></div>
+            <div class="button" id="mode1" onclick="mode1()"><p>Clear barricade</p></div>
+        </div>`)
+    }
+
+    // di chuyển 2 thanh paddle
+    function move() {
+        let speed1 = 0;
+        let speed2 = 0;
+        $(document).on('keydown', keyDown);
+        $(document).on('keyup', keyUp);
+
+        // sự kiện khi nhấn giữ phím
+        function keyDown(e) {
+            switch (e.keyCode) {
+                case 87:
+                    speed1 = -2
+                    break;
+                case 83:
+                    speed1 = 2
+                    break;
+                case 38:
+                    speed2 = -2
+                    break;
+                case 40:
+                    speed2 = 2
+                    break;
+
+            }
+        }
+
+        // sự kiện khi nhả phím
+        function keyUp(e) {
+            if (e.keyCode === 87 || e.keyCode === 83) {
+                speed1 = 0
+            }
+            if (e.keyCode === 38 || e.keyCode === 40) {
+                speed2 = 0
+            }
+        }
+
+        // gán lặp để vẽ khi các paddle thay đổi vị trí
+        moveInt = setInterval(function () {
+            let pos1 = parseInt($("#p1-paddle").css("top").substring(0, $("#p1-paddle").css("top").indexOf('px')));
+            let pos2 = parseInt($("#p2-paddle").css("top").substring(0, $("#p2-paddle").css("top").indexOf('px')));
+            if (pos1 + speed1 > 0 && pos1 + speed1 < 498) {
+                pos1 += speed1
+            }
+            if (pos2 + speed2 > 0 && pos2 + speed2 < 498) {
+                pos2 += speed2
+            }
+            $("#p1-paddle").css('top', pos1 + 'px');
+            $("#p2-paddle").css('top', pos2 + 'px');
+        }, 1)
+    }
+
+    // tạo ball với góc phát ngẫu nhiên
+    function randomNewmBall() {
+        let first = Math.random() < 0.5 ? -1 : 1;
+        let startAngle;
+        if (first === -1) {
+            startAngle = getBallComingAngle(Math.random() * 60 + 30)
+        } else {
+            startAngle = getBallComingAngle(Math.random() * 60 + 210)
+        }
+        return new Ball(screenSize.width / 2, screenSize.height / 2, startAngle[0] * 2, startAngle[1] * 3, 20)
+    }
+
+    // bắt đầu game
+    function restart() {
+        let ball = randomNewmBall();
+        move();
+        // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
+        start = setInterval(function () {
+            ball.draw2Player($("#p1-paddle"), $("#p2-paddle"))
+            //reset lại game mỗi khi bóng out khỏi vùng game
+            if (ball.x < 0 || ball.x > screenSize.width - ball.size) {
+                let p1_score = parseInt($('.p1-score').text());
+                let p2_score = parseInt($('.p2-score').text());
+                if (ball.x < 0) {
+                    p2_score += 1;
+                    $('.p2-score').text(p2_score);
+                } else if (ball.x > screenSize.width - ball.size) {
+                    p1_score += 1;
+                    $('.p1-score').text(p1_score);
+                }
+                if (p1_score === 5 || p2_score === 5) {
+                    $(".game").css('opacity', '0.7')
+                    $(".container.main").append(`
+                        <div class="choose_option">
+                            <h3>Player ` + (p1_score === 5 ? `1` : `2`) + ` Won !</h3>
+                            <div class="button" id="restart" onclick="mode0()"><p>Restart</p></div>
+                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                        </div>
+                    `)
+                    clearInterval(start)
+                    clearInterval(moveInt)
+                } else {
+                    ball = randomNewmBall();
+                }
+            }
+        }, 1)
+    }
+
+    // chọn mode 1 thì hiển thị các level để chọn
+    function mode1() {
+        $(".game").empty().append(`<div class="choose">
+            <h4>Choose Level</h4>
+            <div class="button" id="level0" onclick="choose_level(this.id)"><p>Default</p></div>
+            <div class="button" id="level1" onclick="choose_level(this.id)"><p>Easy</p></div>
+            <div class="button" id="level2" onclick="choose_level(this.id)"><p>Medium</p></div>
+            <div class="button" id="level3" onclick="choose_level(this.id)"><p>Hard</p></div>
+            <div class="button" id="level4" onclick="choose_level(this.id)"><p>Terrible</p></div>
+            <div class="button" id="level5" onclick="choose_level(this.id)"><p>Danger</p></div>
+            <div class="button" id="go-back" onclick="go_back()"><p>Go back</p></div>
+        </div>`);
+    }
+
+    // generate giao diện khi chọn mode0
+    function mode0() {
+        $(".container.main .choose_option").remove()
+        $(".game").css('opacity', '1')
+        $(".game").empty().append(`
+            <div id="p1-paddle"></div>
+            <div id="ball"></div>
+            <div class="boundary"></div>
+            <div id="p2-paddle"></div>
+            <div class="score p1-score">0</div>
+            <div class="score p2-score">0</div>
+        `);
+        restart();
+    }
+
+    function level0() {
+        const noOfBricksPerRow = 5;
+        const noOfRows = 10;
+        const bricksWidth = (screenSize.width / 2) / noOfBricksPerRow;
+        let bricks;
+        const totalBricks = noOfRows * noOfBricksPerRow;
+    }
+
+    function choose_level(id) {
+        switch (id) {
+            case "level0":
+                level0();
+                break;
+        }
+    }
+
+    // tìm góc bay tới của quả bóng và sau đó tính toán trả về góc nó sẽ đổi hướng
+    function getBallComingAngle(angle) {
+        const rads = angle * Math.PI / 180;
+        return [Math.cos(rads), Math.sin(rads)]
+    }
+
+    class Brick {
+        constructor(x, y, width, height) {
+            this.x = x;
+            this.y = y;
+            this.width = width;
+            this.height = height;
+        }
+        
+    }
+
+    // tạo ball
+    class Ball {
+        constructor(x, y, dx, dy, size) {
+            this.x = x;
+            this.y = y;
+            this.dx = dx;
+            this.dy = dy;
+            this.size = size;
+        }
+
+        draw2Player(paddle1, paddle2) {
+            let paddle1Y = parseInt(paddle1.css('top').substring(0, paddle1.css('top').indexOf('px')));
+            let paddle2Y = parseInt(paddle2.css('top').substring(0, paddle2.css('top').indexOf('px')));
+            // Kiểm tra khi va chạm với thanh chắn trái
+            if (paddle1Y <= this.y + this.size && this.y <= paddle1Y + 100
+                && this.x <= 10) {
+                let angle;
+                // Giới hạn góc tối đa mà bóng có thể thay đổi (120 độ với trái)
+                // Va chạm nửa trên
+                if (paddle1Y + (100 / 2) - (this.size / 2) >= this.y + (this.size / 2)) {
+                    angle = getBallComingAngle(120);
+                    // Va chạm nửa dưới
+                } else if (paddle1Y + (100 / 2) + (this.size / 2) < this.y + this.size) {
+                    angle = getBallComingAngle(60);
+                } else {
+                    angle = getBallComingAngle(90);
+                }
+                this.dy = angle[0] * 3;
+                this.dx = angle[1] * 3;
+            }
+            // Kiểm tra khi va chạm với thanh chắn phải
+            if (paddle2Y <= this.y + this.size && this.y <= paddle2Y + 100
+                && this.x + this.size >= screenSize.width - 10) {
+                let angle;
+                // Giới hạn góc tối đa mà bóng có thể thay đổi (300 độ với phải)
+                // Va chạm nửa trên
+                if (paddle2Y + (100 / 2) - (this.size / 2) > this.y + (this.size / 2)) {
+                    angle = getBallComingAngle(240);
+                } else if (paddle2Y + (100 / 2) + (this.size / 2) < this.y + (this.size / 2)) {
+                    angle = getBallComingAngle(300);
+                } else {
+                    angle = getBallComingAngle(270);
+                }
+                this.dy = angle[0] * 3;
+                this.dx = angle[1] * 3;
+            }
+            if (this.y < 0 || this.y > 580) {
+                this.dy = -this.dy
+            }
+            $('#ball').css('left', (this.x + this.dx) + "px");
+            this.x += this.dx
+            $('#ball').css('top', (this.y + this.dy) + "px");
+            this.y += this.dy
+
+        }
+
+        drawMode1(paddle1) {
+            let paddle1Y = parseInt(paddle1.css('top').substring(0, paddle1.css('top').indexOf('px')));
+            // Kiểm tra khi va chạm với thanh chắn trái
+            if (paddle1Y <= this.y + this.size && this.y <= paddle1Y + 100
+                && this.x <= 10) {
+                let angle;
+                // Giới hạn góc tối đa mà bóng có thể thay đổi (120 độ với trái)
+                // Va chạm nửa trên
+                if (paddle1Y + (100 / 2) - (this.size / 2) >= this.y + (this.size / 2)) {
+                    angle = getBallComingAngle(120);
+                    // Va chạm nửa dưới
+                } else if (paddle1Y + (100 / 2) + (this.size / 2) < this.y + this.size) {
+                    angle = getBallComingAngle(60);
+                } else {
+                    angle = getBallComingAngle(90);
+                }
+                this.dy = angle[0] * 3;
+                this.dx = angle[1] * 3;
+            }
+            if (this.y < 0 || this.y > 580) {
+                this.dy = -this.dy
+            }
+            $('#ball').css('left', (this.x + this.dx) + "px");
+            this.x += this.dx
+            $('#ball').css('top', (this.y + this.dy) + "px");
+            this.y += this.dy
+        }
+    }
+
+    $(document).ready(function () {
+    })
+</script>
+</body>
+</html>
