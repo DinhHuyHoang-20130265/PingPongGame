@@ -97,6 +97,28 @@
         .p2-score {
             left: 72.5%;
         }
+
+        .brick {
+            width: calc(200px / 5);
+            height: calc(580px / 10);
+            background: red;
+            margin: 1px 1px 1px 1px;
+        }
+
+        .row .brick:first-child {
+            margin: 1px 1px 1px 790px;
+        }
+
+        .row {
+            width: 1000px;
+            display: flex;
+            margin-left: 0;
+        }
+
+        .row_container {
+            width: 1000px;
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -261,11 +283,27 @@
     }
 
     function level0() {
+        $(".game").empty().append(`
+            <div id="p1-paddle"></div>
+            <div id="ball"></div>`
+        );
         const noOfBricksPerRow = 5;
         const noOfRows = 10;
-        const bricksWidth = (screenSize.width / 2) / noOfBricksPerRow;
         let bricks;
         const totalBricks = noOfRows * noOfBricksPerRow;
+        let r;
+        let cell;
+        let c = $('<div>').addClass('row_container');
+        for (let i = 0; i < noOfRows; i++) {
+            r = $('<div>').addClass('row');
+            for (let j = 0; j < noOfBricksPerRow; j++) {
+                cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                r.append(cell);
+            }
+            c.append(r);
+        }
+        $('.game').append(c);
+
     }
 
     function choose_level(id) {
@@ -289,7 +327,7 @@
             this.width = width;
             this.height = height;
         }
-        
+
     }
 
     // tạo ball
