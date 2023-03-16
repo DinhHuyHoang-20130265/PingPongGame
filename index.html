@@ -5,13 +5,40 @@
     <title>Ping pong game</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <style>
+        body:before {
+            content: ' ';
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.8;
+            background: url("img/backgrounds-full_1.png") no-repeat 50% 0;
+            background-size: cover;
+        }
+
         .game {
             width: 1000px;
             border: 2px solid #4e555b;
             height: 600px;
             margin: auto;
-            background: lightblue;
             position: relative;
+        }
+
+        .game:before {
+            content: ' ';
+            display: block;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.7;
+            background-image: url("img/bg.png");
+            background-repeat: no-repeat;
+            background-position: 50% 0;
+            background-size: cover;
         }
 
         #p1-paddle, #p2-paddle {
@@ -41,6 +68,9 @@
             top: 50%;
             left: 50%;
             border-radius: 50%;
+            background-image: linear-gradient(
+                    red, #f06d06
+            );
         }
 
         .ball1, .ball2 {
@@ -51,18 +81,21 @@
             top: 50%;
             left: 50%;
             border-radius: 50%;
+            background-image: linear-gradient(
+                    red, #f06d06
+            );
         }
 
         .choose {
             position: absolute;
             top: calc(40% - 50px);
-            left: 44%;
+            left: 42.5%;
         }
 
         .choose_option {
             position: absolute;
             top: calc(40% - 50px);
-            left: 44%;
+            left: 42.5%;
         }
 
         .button {
@@ -85,19 +118,11 @@
             text-align: center;
         }
 
-        .boundary {
-            width: 0;
-            height: 100%;
-            border-left: 5px dashed #5a6268;
-            left: calc(50% - 2.5px);
-            position: absolute;
-        }
-
         .score {
             font-family: Arial, sans-serif;
             font-size: 100px;
             position: absolute;
-            color: rgba(193, 246, 230, 0.75);
+            color: rgb(183, 77, 77);
         }
 
         .p1-score {
@@ -112,7 +137,7 @@
             font-family: Arial, sans-serif;
             font-size: 25px;
             position: absolute;
-            color: rgba(90, 110, 105, 0.75);
+            color: rgb(183, 77, 77);
             top: 10%;
             left: 5%;
         }
@@ -409,7 +434,7 @@
             barricadeX2 += dx2;
             $("#barricade-1").css('left', barricadeX1)
             $("#barricade-2").css('left', barricadeX2)
-        }, 50)
+        }, 1)
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball.drawMode3($("#p1-paddle"), x, y)
@@ -477,7 +502,7 @@
             barricadeX2 += dx2;
             $("#barricade-1").css('left', barricadeX1)
             $("#barricade-2").css('left', barricadeX2)
-        }, 50)
+        }, 1)
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball1.drawMode4($("#p1-paddle"), x, y, 1)
@@ -578,7 +603,6 @@
         $(".game").empty().append(`
             <div id="p1-paddle"></div>
             <div id="ball"></div>
-            <div class="boundary"></div>
             <div id="p2-paddle"></div>
             <div class="score p1-score">0</div>
             <div class="score p2-score">0</div>
@@ -602,10 +626,13 @@
         let r;
         let cell;
         let c = $('<div>').addClass('row_container');
+        let img;
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
             for (let j = 0; j < noOfBricksPerRow; j++) {
                 cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                img = $(`<img src="img/203878.png"/>`)
+                cell.append(img)
                 r.append(cell);
             }
             c.append(r);
@@ -632,10 +659,13 @@
         let r;
         let cell;
         let c = $('<div>').addClass('row_container');
+        let img;
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
             for (let j = 0; j < noOfBricksPerRow; j++) {
                 cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                img = $(`<img src="img/203878.png"/>`)
+                cell.append(img)
                 r.append(cell);
             }
             c.append(r);
@@ -662,10 +692,13 @@
         let r;
         let cell;
         let c = $('<div>').addClass('row_container');
+        let img;
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
             for (let j = 0; j < noOfBricksPerRow; j++) {
                 cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                img = $(`<img src="img/203878.png"/>`)
+                cell.append(img)
                 r.append(cell);
             }
             c.append(r);
@@ -693,10 +726,13 @@
         let r;
         let cell;
         let c = $('<div>').addClass('row_container');
+        let img;
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
             for (let j = 0; j < noOfBricksPerRow; j++) {
                 cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                img = $(`<img src="img/203878.png"/>`)
+                cell.append(img)
                 r.append(cell);
             }
             c.append(r);
@@ -954,8 +990,10 @@
                 && this.y + this.size >= barricade1Y && this.y <= barricade1Y + 200) {
                 const ballCenterX = this.x + this.size / 2;
                 const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricade1X || ballCenterX > barricade1X + 20) {
-                    this.dx = -this.dx
+                if (ballCenterX < barricade1X) {
+                    this.dx = -Math.abs(this.dx)
+                } else if (ballCenterX > barricade1X + 20) {
+                    this.dx = Math.abs(this.dx)
                 }
                 if (ballCenterY < barricade1Y || ballCenterY > barricade1Y + 200) {
                     this.dy = -this.dy
@@ -965,8 +1003,10 @@
                 && this.y + this.size >= barricade2Y && this.y <= barricade2Y + 200) {
                 const ballCenterX = this.x + this.size / 2;
                 const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricade2X || ballCenterX > barricade2X + 20) {
-                    this.dx = -this.dx
+                if (ballCenterX < barricade2X) {
+                    this.dx = -Math.abs(this.dx)
+                } else if (ballCenterX > barricade2X + 20) {
+                    this.dx = Math.abs(this.dx)
                 }
                 if (ballCenterY < barricade2Y || ballCenterY > barricade2Y + 200) {
                     this.dy = -this.dy
@@ -1035,8 +1075,10 @@
                 && this.y + this.size >= barricade1Y && this.y <= barricade1Y + 200) {
                 const ballCenterX = this.x + this.size / 2;
                 const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricade1X || ballCenterX > barricade1X + 20) {
-                    this.dx = -this.dx
+                if (ballCenterX < barricade1X) {
+                    this.dx = -Math.abs(this.dx)
+                } else if (ballCenterX > barricade1X + 20) {
+                    this.dx = Math.abs(this.dx)
                 }
                 if (ballCenterY < barricade1Y || ballCenterY > barricade1Y + 200) {
                     this.dy = -this.dy
@@ -1046,8 +1088,10 @@
                 && this.y + this.size >= barricade2Y && this.y <= barricade2Y + 200) {
                 const ballCenterX = this.x + this.size / 2;
                 const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricade2X || ballCenterX > barricade2X + 20) {
-                    this.dx = -this.dx
+                if (ballCenterX < barricade2X) {
+                    this.dx = -Math.abs(this.dx)
+                } else if (ballCenterX > barricade2X + 20) {
+                    this.dx = Math.abs(this.dx)
                 }
                 if (ballCenterY < barricade2Y || ballCenterY > barricade2Y + 200) {
                     this.dy = -this.dy
@@ -1087,9 +1131,6 @@
             this.y += this.dy
         }
     }
-
-    $(document).ready(function () {
-    })
 </script>
 </body>
 </html>
