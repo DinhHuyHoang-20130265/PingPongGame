@@ -5,17 +5,12 @@
     <title>Ping pong game</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <style>
-        body:before {
-            content: ' ';
-            display: block;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.8;
-            background: url("img/backgrounds-full_1.png") no-repeat 50% 0;
-            background-size: cover;
+        #video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
         }
 
         .game {
@@ -24,21 +19,14 @@
             height: 600px;
             margin: auto;
             position: relative;
+            background: rgba(180, 234, 246, 0.4);
         }
 
-        .game:before {
-            content: ' ';
-            display: block;
+        #line-break {
             position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0.7;
-            background-image: url("img/bg.png");
-            background-repeat: no-repeat;
-            background-position: 50% 0;
-            background-size: cover;
+            border: 10px dashed;
+            height: 596px;
+            left: calc(50% - 5px);
         }
 
         #p1-paddle, #p2-paddle {
@@ -74,15 +62,19 @@
         }
 
         .choose {
+            width: 300px;
+            text-align: center;
             position: absolute;
             top: calc(40% - 50px);
-            left: 42.5%;
+            left: calc(50% - 150px);
         }
 
         .choose_option {
+            text-align: center;
+            width: 300px;
             position: absolute;
             top: calc(40% - 50px);
-            left: 42.5%;
+            left: calc(50% - 150px);
         }
 
         .button {
@@ -155,7 +147,8 @@
             width: 20px;
             height: 200px;
             position: absolute;
-            background: whitesmoke;
+            background: url("img/wood.jpg");
+            border-radius: 5px;
         }
 
         #barricade-1 {
@@ -170,6 +163,9 @@
     </style>
 </head>
 <body>
+<video autoplay loop muted id="video">
+    <source src="video/Background.mp4" type="video/mp4">
+</video>
 <div class="container main">
     <div class="game">
         <div class="choose">
@@ -519,7 +515,7 @@
         }, 1)
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
-            ball1.drawMode4($("#p1-paddle"), x, y)
+            ball1.drawMode4($("#p1-paddle"), x, y, 1)
             if (ball1.x < 0 || ball2.x < 0) {
                 let p1_life = parseInt($('.p1_life a').text());
                 p1_life -= 1;
@@ -549,6 +545,101 @@
                         <div class="choose_option">
                             <h3>You won the game !</h3>
                             <div class="button" id="restart" onclick="level3()"><p>Restart</p></div>
+                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                        </div>
+                    `)
+                clearInterval(start)
+                clearInterval(moveInt)
+                clearInterval(movingBarricade)
+            }
+        }, 1)
+    }
+
+    // gameplay cho chế độ phá gạch với level 4
+    function gameplay5(x, y) {
+        let ball1 = randomNewBallMode1();
+        move1();
+        let OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
+        let OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
+        let OldY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
+        let OldY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
+        let barricadeX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
+        let barricadeX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
+        let barricadeY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
+        let barricadeY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
+        let dx1 = -1;
+        let dx2 = 1;
+        let dy1 = 0;
+        let dy2 = 0;
+        let movingBarricade = setInterval(function () {
+            if (barricadeX1 < OldX1 - 100) {
+                dx1 = 0
+                dy1 = 1
+                if (barricadeY1 > OldY2) {
+                    dx1 = 1
+                    dy1 = 0
+                }
+            } else if (barricadeX1 > OldX1 + 100) {
+                dx1 = 0
+                dy1 = -1
+                if (barricadeY1 < OldY1) {
+                    dx1 = -1
+                    dy1 = 0
+                }
+            }
+            if (barricadeX2 < OldX2 - 100) {
+                dx2 = 0
+                dy2 = 1
+                if (barricadeY2 > OldY2) {
+                    dx2 = 1
+                    dy2 = 0
+                }
+            } else if (barricadeX2 > OldX2 + 100) {
+                dx2 = 0
+                dy2 = -1
+                if (barricadeY2 < OldY1) {
+                    dx2 = -1
+                    dy2 = 0
+                }
+            }
+            barricadeX1 += dx1;
+            barricadeY1 += dy1;
+            barricadeX2 += dx2;
+            barricadeY2 += dy2;
+            $("#barricade-1").css('left', barricadeX1)
+            $("#barricade-2").css('left', barricadeX2)
+            $("#barricade-1").css('top', barricadeY1)
+            $("#barricade-2").css('top', barricadeY2)
+        }, 1)
+        // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
+        start = setInterval(function () {
+            ball1.drawMode5($("#p1-paddle"), x, y, 1)
+            if (ball1.x < 0) {
+                let p1_life = parseInt($('.p1_life a').text());
+                p1_life -= 1;
+                $('.p1_life a').text(p1_life);
+                if (p1_life === 0) {
+                    $(".game").css('opacity', '0.7')
+                    $(".container.main").append(`
+                        <div class="choose_option">
+                            <h3>You lose !</h3>
+                            <div class="button" id="restart" onclick="level4()"><p>Restart</p></div>
+                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                        </div>
+                    `)
+                    clearInterval(start)
+                    clearInterval(moveInt)
+                    clearInterval(movingBarricade)
+                } else {
+                    ball1 = randomNewBallMode1();
+                }
+            }
+            if ($(".active").length === 60) {
+                $(".game").css('opacity', '0.7')
+                $(".container.main").append(`
+                        <div class="choose_option">
+                            <h3>You won the game !</h3>
+                            <div class="button" id="restart" onclick="level4()"><p>Restart</p></div>
                             <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
                         </div>
                     `)
@@ -616,6 +707,7 @@
         $(".game").empty().append(`
             <div id="p1-paddle"></div>
             <div id="ball"></div>
+            <div id="line-break"></div>
             <div id="p2-paddle"></div>
             <div class="score p1-score">0</div>
             <div class="score p2-score">0</div>
@@ -748,7 +840,8 @@
                 if (j === -1) {
                     if (i !== 4 && i !== 5) {
                         cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
-                        cell.css("background", "white")
+                        img = $(`<img src="img/Iron_Block.png"/>`)
+                        cell.append(img)
                     } else {
                         cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                         cell.css("opacity", "0")
@@ -765,6 +858,51 @@
         $('.game').append(c);
         $(".row .brick:first-child").css("margin", "1px 1px 1px " + (screenSize.width - 42 * (noOfBricksPerRow + 1)) + "px")
         gameplay4(noOfBricksPerRow, noOfRows);
+    }
+
+    // gameplay cho chế độ phá gạch với level 4
+    function level4() {
+        $(".container.main .choose_option").remove()
+        $(".game").css('opacity', '1')
+        $(".game").empty().append(`
+            <div class="p1_life">Life: <a>2</a></div>
+            <div id="p1-paddle"></div>
+            <div id="barricade-1" class="barricade"></div>
+            <div id="barricade-2" class="barricade"></div>
+            <div id="ball"></div>
+        `);
+        const noOfBricksPerRow = 5;
+        const noOfRows = 10;
+        let bricks;
+        const totalBricks = noOfRows * noOfBricksPerRow;
+        let r;
+        let cell;
+        let c = $('<div>').addClass('row_container');
+        let img;
+        for (let i = 0; i < noOfRows; i++) {
+            r = $('<div>').addClass('row');
+            for (let j = -2; j < noOfBricksPerRow; j++) {
+                if (j === -2) {
+                    if (i > 1 && i < 8) {
+                        cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                        img = $(`<img src="img/Iron_Block.png"/>`)
+                        cell.append(img)
+                    } else {
+                        cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                        cell.css("opacity", "0")
+                    }
+                } else {
+                    cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j + " not-break-yet");
+                    img = $(`<img src="img/203878.png"/>`)
+                    cell.append(img)
+                }
+                r.append(cell);
+            }
+            c.append(r);
+        }
+        $('.game').append(c);
+        $(".row .brick:first-child").css("margin", "1px 1px 1px " + (screenSize.width - 42 * (noOfBricksPerRow + 2)) + "px")
+        gameplay5(noOfBricksPerRow, noOfRows);
     }
 
     function choose_level(id) {
@@ -790,6 +928,36 @@
         }
     }
 
+    function pongWood() {
+        let pongWood = new Audio("sound/pongWood.mp3")
+        pongWood.volume = 0.2
+        pongWood.play()
+    }
+
+    function pongPaddle() {
+        let audio = new Audio("sound/pongPaddle.mp3")
+        audio.volume = 0.2
+        audio.play()
+    }
+
+    function pongCollision() {
+        let pongCollision = new Audio("sound/pongCollision.mp3")
+        pongCollision.volume = 0.2
+        pongCollision.play()
+    }
+
+    function pongBrick() {
+        let pongBrick = new Audio("sound/pongBrick.mp3")
+        pongBrick.volume = 0.2
+        pongBrick.play()
+    }
+
+    function pongSteel() {
+        let pongSteel = new Audio("sound/pongSteel.mp3")
+        pongSteel.volume = 0.2
+        pongSteel.play()
+    }
+
     // tạo ball
     class Ball {
         constructor(x, y, dx, dy, size) {
@@ -800,7 +968,157 @@
             this.size = size;
         }
 
-        // hàm vẽ chế độ 2 người
+        updatePosition() {
+            this.x += this.dx
+            this.y += this.dy
+            $('#ball').css('left', this.x + "px");
+            $('#ball').css('top', this.y + "px");
+        }
+
+        checkCollisionBrickMode(paddleY) {
+            if (paddleY <= this.y + this.size && this.y <= paddleY + 100
+                && this.x <= 10) {
+                let angle;
+                // vị trí giao nhau tại x của paddle1 và bóng
+                let intersectX = 10;
+                // vị trí giao nhau tại y của paddle1 và bóng
+                let intersectY = this.y;
+                // giao điểm tương đối từ trung điểm của paddle tới giao điểm y
+                let relativeIntersectY = (paddleY + 100 / 2) - intersectY;
+                // tìm góc rads, giới hạn tối đa ở đây sẽ là 75 độ khi bóng va chạm
+                angle = (relativeIntersectY / 50) * (Math.PI / 2 - Math.PI / 12);
+                // tính toán bằng biểu thức cho vận tốc góc (ở đây là chuyển động phẳng 2d)
+                let newBallSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+                this.dx = newBallSpeed * Math.cos(angle);
+                this.dy = newBallSpeed * -Math.sin(angle);
+                pongPaddle();
+            }
+        }
+
+        // Kiểm tra va chạm với vật chắn có hình chữ nhật
+        collisionBarricade(barricadeX, barricadeY, width, height) {
+            if (this.x + this.size >= barricadeX && this.x <= barricadeX + width
+                && this.y + this.size >= barricadeY && this.y <= barricadeY + height) {
+                const ballCenterX = this.x + this.size / 2;
+                const ballCenterY = this.y + this.size / 2;
+                if (ballCenterX < barricadeX) {
+                    this.dx = -Math.abs(this.dx)
+                    pongWood()
+                } else if (ballCenterX > barricadeX + width) {
+                    this.dx = Math.abs(this.dx)
+                    pongWood()
+                }
+                if (ballCenterY < barricadeY) {
+                    this.dy = -Math.abs(this.dy)
+                    pongWood()
+                } else if (ballCenterY > barricadeY + height) {
+                    this.dy = Math.abs(this.dy)
+                    pongWood()
+                }
+            }
+        }
+
+        // Kiểm tra va chạm với gạch cho level 1 và 2
+        collisionWith1TimeBrick(brickPerRow, row, rowPerBrickStart) {
+            for (let i = 0; i < row; i++) {
+                for (let j = rowPerBrickStart; j < brickPerRow; j++) {
+                    let brick = $('.brick' + '-' + i + '-' + j);
+                    let y_brick = brick.position().top;
+                    let x_brick = (j === rowPerBrickStart) ? (screenSize.width - 42 * (brickPerRow + Math.abs(rowPerBrickStart))) : brick.position().left;
+                    if (!brick.hasClass("active")) {
+                        if (this.x + this.size >= x_brick && this.x <= x_brick + 42
+                            && this.y + this.size >= y_brick && this.y <= y_brick + 60) {
+                            const ballCenterX = this.x + this.size / 2;
+                            const ballCenterY = this.y + this.size / 2;
+                            if (ballCenterX < x_brick) {
+                                this.dx = -Math.abs(this.dx)
+                                brick.addClass("active")
+                                pongBrick()
+                            } else if (ballCenterX > x_brick + 42) {
+                                this.dx = Math.abs(this.dx)
+                                brick.addClass("active")
+                                pongBrick()
+                            }
+                            if (ballCenterY < y_brick) {
+                                this.dy = -Math.abs(this.dy)
+                                brick.addClass("active")
+                                pongBrick()
+                            } else if (ballCenterY > y_brick + 60) {
+                                this.dy = Math.abs(this.dy)
+                                brick.addClass("active")
+                                pongBrick()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Kiểm tra va chạm với gạch cho level 3 và 4
+        collisionWith2TimeBrick(brickPerRow, row, rowPerBrickStart) {
+            for (let i = 0; i < row; i++) {
+                for (let j = rowPerBrickStart; j < brickPerRow; j++) {
+                    let brick = $('.brick' + '-' + i + '-' + j);
+                    let y_brick = brick.position().top;
+                    let x_brick = (j === rowPerBrickStart) ? (screenSize.width - 42 * (brickPerRow + Math.abs(rowPerBrickStart))) : brick.position().left;
+                    if (!brick.hasClass("active") && brick.css("opacity") !== "0") {
+                        if (this.x + this.size >= x_brick && this.x <= x_brick + 40
+                            && this.y + this.size >= y_brick && this.y <= y_brick + 58) {
+                            const ballCenterX = this.x + this.size / 2;
+                            const ballCenterY = this.y + this.size / 2;
+                            if (ballCenterX < x_brick) {
+                                this.dx = -Math.abs(this.dx)
+                                if (j !== rowPerBrickStart) {
+                                    addCracked(brick)
+                                    pongBrick()
+                                } else if (j === rowPerBrickStart && brick.css("opacity") !== "0") {
+                                    pongSteel()
+                                }
+                            } else if (ballCenterX > x_brick + 40) {
+                                this.dx = Math.abs(this.dx)
+                                if (j !== rowPerBrickStart) {
+                                    addCracked(brick)
+                                    pongBrick()
+                                } else if (j === rowPerBrickStart && brick.css("opacity") !== "0") {
+                                    pongSteel()
+                                }
+                            }
+                            if (ballCenterY < y_brick) {
+                                this.dy = -Math.abs(this.dy)
+                                if (j !== rowPerBrickStart) {
+                                    addCracked(brick)
+                                    pongBrick()
+                                } else if (j === rowPerBrickStart && brick.css("opacity") !== "0") {
+                                    pongSteel()
+                                }
+                            } else if (ballCenterY > y_brick + 58) {
+                                this.dy = Math.abs(this.dy)
+                                if (j !== rowPerBrickStart) {
+                                    addCracked(brick)
+                                    lpongBrick()
+                                } else if (j === rowPerBrickStart && brick.css("opacity") !== "0") {
+                                    pongSteel()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Kiểm tra va chạm với cạnh trên dưới và phải của màn hình trò chơi
+        collisionScreen() {
+            if (this.y < 0 || this.y > 580) {
+                this.dy = -this.dy
+                pongCollision()
+            }
+            if (this.x > 980) {
+                this.dx = -this.dx
+                pongCollision()
+            }
+        }
+
+        // Hàm vẽ chế độ 2 người
         draw2Player(paddle1, paddle2) {
             let paddle1Y = parseInt(paddle1.css('top').substring(0, paddle1.css('top').indexOf('px')));
             let paddle2Y = parseInt(paddle2.css('top').substring(0, paddle2.css('top').indexOf('px')));
@@ -819,8 +1137,10 @@
                 angle = (relativeIntersectY / 50) * (Math.PI / 2 - Math.PI / 12);
                 // tính toán bằng biểu thức cho vận tốc góc (ở đây là chuyển động phẳng 2d)
                 let newBallSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+                // Cập nhật dx, dy mới cho quả bóng
                 this.dx = newBallSpeed * Math.cos(angle);
                 this.dy = newBallSpeed * -Math.sin(angle);
+                pongPaddle()
             }
             // Kiểm tra khi va chạm với thanh chắn phải
             if (paddle2Y <= this.y + this.size && this.y <= paddle2Y + 100
@@ -836,77 +1156,31 @@
                 angle = (relativeIntersectY / 50) * (Math.PI / 2 - Math.PI / 12);
                 // tính toán bằng biểu thức cho vận tốc góc (ở đây là chuyển động phẳng 2d)
                 let newBallSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+                // Cập nhật dx, dy mới cho quả bóng
                 this.dx = newBallSpeed * Math.cos(angle) * -1;
                 this.dy = newBallSpeed * Math.sin(angle) * -1;
+                pongPaddle()
             }
+            // Kiểm tra va chạm cạnh trên / dưới của màn hình game
             if (this.y < 0 || this.y > 580) {
                 this.dy = -this.dy
+                pongCollision()
             }
-            $('#ball').css('left', (this.x + this.dx) + "px");
-            this.x += this.dx
-            $('#ball').css('top', (this.y + this.dy) + "px");
-            this.y += this.dy
 
+            this.updatePosition()
         }
 
-        // hàm vẽ chế độ phá gạch level mặc định
+        // Hàm vẽ chế độ phá gạch level mặc định
         drawMode1(paddle1, brickPerRow, row) {
             let paddle1Y = parseInt(paddle1.css('top').substring(0, paddle1.css('top').indexOf('px')));
             // Kiểm tra khi va chạm với thanh chắn trái
-            if (paddle1Y <= this.y + this.size && this.y <= paddle1Y + 100
-                && this.x <= 10) {
-                let angle;
-                // vị trí giao nhau tại x của paddle1 và bóng
-                let intersectX = 10;
-                // vị trí giao nhau tại y của paddle1 và bóng
-                let intersectY = this.y;
-                // giao điểm tương đối từ trung điểm của paddle tới giao điểm y
-                let relativeIntersectY = (paddle1Y + 100 / 2) - intersectY;
-                // tìm góc rads, giới hạn tối đa ở đây sẽ là 75 độ khi bóng va chạm
-                angle = (relativeIntersectY / 50) * (Math.PI / 2 - Math.PI / 12);
-                // tính toán bằng biểu thức cho vận tốc góc (ở đây là chuyển động phẳng 2d)
-                let newBallSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
-                this.dx = newBallSpeed * Math.cos(angle);
-                this.dy = newBallSpeed * -Math.sin(angle);
-            }
-            for (let i = 0; i < row; i++) {
-                for (let j = 0; j < brickPerRow; j++) {
-                    let brick = $('.brick' + '-' + i + '-' + j);
-                    let y_brick = brick.position().top;
-                    let x_brick = (j === 0) ? 790 : brick.position().left;
-                    if (!brick.hasClass("active")) {
-                        if (this.x + this.size >= x_brick && this.x <= x_brick + 40
-                            && this.y + this.size >= y_brick && this.y <= y_brick + 58) {
-                            const ballCenterX = this.x + this.size / 2;
-                            const ballCenterY = this.y + this.size / 2;
-                            if (ballCenterX < x_brick) {
-                                this.dx = -Math.abs(this.dx)
-                                brick.addClass("active")
-                            } else if (ballCenterX > x_brick + 40) {
-                                this.dx = Math.abs(this.dx)
-                                brick.addClass("active")
-                            }
-                            if (ballCenterY < y_brick) {
-                                this.dy = -Math.abs(this.dy)
-                                brick.addClass("active")
-                            } else if (ballCenterY > y_brick + 58) {
-                                this.dy = Math.abs(this.dy)
-                                brick.addClass("active")
-                            }
-                        }
-                    }
-                }
-            }
-            if (this.y < 0 || this.y > 580) {
-                this.dy = -this.dy
-            }
-            if (this.x > 980) {
-                this.dx = -this.dx
-            }
-            $('#ball').css('left', (this.x + this.dx) + "px");
-            this.x += this.dx
-            $('#ball').css('top', (this.y + this.dy) + "px");
-            this.y += this.dy
+            this.checkCollisionBrickMode(paddle1Y);
+
+            this.collisionWith1TimeBrick(brickPerRow, row, 0);
+
+            this.collisionScreen();
+
+            this.updatePosition();
         }
 
         // hàm vẽ chế độ phá gạch level 1
@@ -916,83 +1190,14 @@
             let barricade1Y = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
             let barricade2Y = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
             // Kiểm tra khi va chạm với thanh chắn trái
-            if (paddle1Y <= this.y + this.size && this.y <= paddle1Y + 100
-                && this.x <= 10) {
-                let angle;
-                // vị trí giao nhau tại x của paddle1 và bóng
-                let intersectX = 10;
-                // vị trí giao nhau tại y của paddle1 và bóng
-                let intersectY = this.y;
-                // giao điểm tương đối từ trung điểm của paddle tới giao điểm y
-                let relativeIntersectY = (paddle1Y + 100 / 2) - intersectY;
-                // tìm góc rads, giới hạn tối đa ở đây sẽ là 75 độ khi bóng va chạm
-                angle = (relativeIntersectY / 50) * (Math.PI / 2 - Math.PI / 12);
-                // tính toán bằng biểu thức cho vận tốc góc (ở đây là chuyển động phẳng 2d)
-                let newBallSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
-                this.dx = newBallSpeed * Math.cos(angle);
-                this.dy = newBallSpeed * -Math.sin(angle);
-            }
+            this.checkCollisionBrickMode(paddle1Y);
 
-            if (this.x + this.size >= barricadeX && this.x <= barricadeX + 20
-                && this.y + this.size >= barricade1Y && this.y <= barricade1Y + 200) {
-                const ballCenterX = this.x + this.size / 2;
-                const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricadeX || ballCenterX > barricadeX + 20) {
-                    this.dx = -this.dx
-                }
-                if (ballCenterY < barricade1Y || ballCenterY > barricade1Y + 200) {
-                    this.dy = -this.dy
-                }
-            }
-            if (this.x + this.size >= barricadeX && this.x <= barricadeX + 20
-                && this.y + this.size >= barricade2Y && this.y <= barricade2Y + 200) {
-                const ballCenterX = this.x + this.size / 2;
-                const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricadeX || ballCenterX > barricadeX + 20) {
-                    this.dx = -this.dx
-                }
-                if (ballCenterY < barricade2Y || ballCenterY > barricade2Y + 200) {
-                    this.dy = -this.dy
-                }
-            }
-            if (this.y < 0 || this.y > 580) {
-                this.dy = -this.dy
-            }
-            if (this.x > 980) {
-                this.dx = -this.dx
-            }
-            for (let i = 0; i < row; i++) {
-                for (let j = 0; j < brickPerRow; j++) {
-                    let brick = $('.brick' + '-' + i + '-' + j);
-                    let y_brick = brick.position().top;
-                    let x_brick = (j === 0) ? 790 : brick.position().left;
-                    if (!brick.hasClass("active")) {
-                        if (this.x + this.size >= x_brick && this.x <= x_brick + 40
-                            && this.y + this.size >= y_brick && this.y <= y_brick + 58) {
-                            const ballCenterX = this.x + this.size / 2;
-                            const ballCenterY = this.y + this.size / 2;
-                            if (ballCenterX < x_brick) {
-                                this.dx = -Math.abs(this.dx)
-                                brick.addClass("active")
-                            } else if (ballCenterX > x_brick + 40) {
-                                this.dx = Math.abs(this.dx)
-                                brick.addClass("active")
-                            }
-                            if (ballCenterY < y_brick) {
-                                this.dy = -Math.abs(this.dy)
-                                brick.addClass("active")
-                            } else if (ballCenterY > y_brick + 58) {
-                                this.dy = Math.abs(this.dy)
-                                brick.addClass("active")
-                            }
-                        }
-                    }
-                }
-            }
-            $('#ball').css('left', (this.x + this.dx) + "px");
-            this.x += this.dx
-            $('#ball').css('top', (this.y + this.dy) + "px");
-            this.y += this.dy
+            this.collisionBarricade(barricadeX, barricade1Y, 20, 200)
+            this.collisionBarricade(barricadeX, barricade2Y, 20, 200)
+
+            this.collisionScreen();
+            this.collisionWith1TimeBrick(brickPerRow, row, 0);
+            this.updatePosition();
         }
 
         // hàm vẽ chế độ phá gạch level 2
@@ -1003,89 +1208,14 @@
             let barricade1Y = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
             let barricade2Y = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
             // Kiểm tra khi va chạm với thanh chắn trái
-            if (paddle1Y <= this.y + this.size && this.y <= paddle1Y + 100
-                && this.x <= 10) {
-                let angle;
-                // vị trí giao nhau tại x của paddle1 và bóng
-                let intersectX = 10;
-                // vị trí giao nhau tại y của paddle1 và bóng
-                let intersectY = this.y;
-                // giao điểm tương đối từ trung điểm của paddle tới giao điểm y
-                let relativeIntersectY = (paddle1Y + 100 / 2) - intersectY;
-                // tìm góc rads, giới hạn tối đa ở đây sẽ là 75 độ khi bóng va chạm
-                angle = (relativeIntersectY / 50) * (Math.PI / 2 - Math.PI / 12);
-                // tính toán bằng biểu thức cho vận tốc góc (ở đây là chuyển động phẳng 2d)
-                let newBallSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
-                this.dx = newBallSpeed * Math.cos(angle);
-                this.dy = newBallSpeed * -Math.sin(angle);
-            }
+            this.checkCollisionBrickMode(paddle1Y);
 
-            if (this.x + this.size >= barricade1X && this.x <= barricade1X + 20
-                && this.y + this.size >= barricade1Y && this.y <= barricade1Y + 200) {
-                const ballCenterX = this.x + this.size / 2;
-                const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricade1X) {
-                    this.dx = -Math.abs(this.dx)
-                } else if (ballCenterX > barricade1X + 20) {
-                    this.dx = Math.abs(this.dx)
-                }
-                if (ballCenterY < barricade1Y || ballCenterY > barricade1Y + 200) {
-                    this.dy = -this.dy
-                }
-            }
-            if (this.x + this.size >= barricade2X && this.x <= barricade2X + 20
-                && this.y + this.size >= barricade2Y && this.y <= barricade2Y + 200) {
-                const ballCenterX = this.x + this.size / 2;
-                const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricade2X) {
-                    this.dx = -Math.abs(this.dx)
-                } else if (ballCenterX > barricade2X + 20) {
-                    this.dx = Math.abs(this.dx)
-                }
-                if (ballCenterY < barricade2Y) {
-                    this.dy = -Math.abs(this.dy)
-                } else if (ballCenterY > barricade2Y + 200) {
-                    this.dy = Math.abs(this.dy)
-                }
-            }
-            if (this.y < 0 || this.y > 580) {
-                this.dy = -this.dy
-            }
-            if (this.x > 980) {
-                this.dx = -this.dx
-            }
-            for (let i = 0; i < row; i++) {
-                for (let j = 0; j < brickPerRow; j++) {
-                    let brick = $('.brick' + '-' + i + '-' + j);
-                    let y_brick = brick.position().top;
-                    let x_brick = (j === 0) ? 790 : brick.position().left;
-                    if (!brick.hasClass("active")) {
-                        if (this.x + this.size >= x_brick && this.x <= x_brick + 40
-                            && this.y + this.size >= y_brick && this.y <= y_brick + 58) {
-                            const ballCenterX = this.x + this.size / 2;
-                            const ballCenterY = this.y + this.size / 2;
-                            if (ballCenterX < x_brick) {
-                                this.dx = -Math.abs(this.dx)
-                                brick.addClass("active")
-                            } else if (ballCenterX > x_brick + 40) {
-                                this.dx = Math.abs(this.dx)
-                                brick.addClass("active")
-                            }
-                            if (ballCenterY < y_brick) {
-                                this.dy = -Math.abs(this.dy)
-                                brick.addClass("active")
-                            } else if (ballCenterY > y_brick + 58) {
-                                this.dy = Math.abs(this.dy)
-                                brick.addClass("active")
-                            }
-                        }
-                    }
-                }
-            }
-            $('#ball').css('left', (this.x + this.dx) + "px");
-            this.x += this.dx
-            $('#ball').css('top', (this.y + this.dy) + "px");
-            this.y += this.dy
+            this.collisionBarricade(barricade1X, barricade1Y, 20, 200)
+            this.collisionBarricade(barricade2X, barricade2Y, 20, 200)
+
+            this.collisionScreen();
+            this.collisionWith1TimeBrick(brickPerRow, row, 0);
+            this.updatePosition();
         }
 
         // hàm vẽ chế độ phá gạch level 3
@@ -1096,99 +1226,43 @@
             let barricade1Y = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
             let barricade2Y = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
             // Kiểm tra khi va chạm với thanh chắn trái
-            if (paddle1Y <= this.y + this.size && this.y <= paddle1Y + 100
-                && this.x <= 10) {
-                let angle;
-                // vị trí giao nhau tại x của paddle1 và bóng
-                let intersectX = 10;
-                // vị trí giao nhau tại y của paddle1 và bóng
-                let intersectY = this.y;
-                // giao điểm tương đối từ trung điểm của paddle tới giao điểm y
-                let relativeIntersectY = (paddle1Y + 100 / 2) - intersectY;
-                // tìm góc rads, giới hạn tối đa ở đây sẽ là 75 độ khi bóng va chạm
-                angle = (relativeIntersectY / 50) * (Math.PI / 2 - Math.PI / 12);
-                // tính toán bằng biểu thức cho vận tốc góc (ở đây là chuyển động phẳng 2d)
-                let newBallSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
-                this.dx = newBallSpeed * Math.cos(angle);
-                this.dy = newBallSpeed * -Math.sin(angle);
-            }
+            this.checkCollisionBrickMode(paddle1Y);
 
-            if (this.x + this.size >= barricade1X && this.x <= barricade1X + 20
-                && this.y + this.size >= barricade1Y && this.y <= barricade1Y + 200) {
-                const ballCenterX = this.x + this.size / 2;
-                const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricade1X) {
-                    this.dx = -Math.abs(this.dx)
-                } else if (ballCenterX > barricade1X + 20) {
-                    this.dx = Math.abs(this.dx)
-                }
-                if (ballCenterY < barricade1Y) {
-                    this.dy = -Math.abs(this.dy)
-                } else if (ballCenterY > barricade1Y + 200) {
-                    this.dy = Math.abs(this.dy)
-                }
-            }
-            if (this.x + this.size >= barricade2X && this.x <= barricade2X + 20
-                && this.y + this.size >= barricade2Y && this.y <= barricade2Y + 200) {
-                const ballCenterX = this.x + this.size / 2;
-                const ballCenterY = this.y + this.size / 2;
-                if (ballCenterX < barricade2X) {
-                    this.dx = -Math.abs(this.dx)
-                } else if (ballCenterX > barricade2X + 20) {
-                    this.dx = Math.abs(this.dx)
-                }
-                if (ballCenterY < barricade2Y) {
-                    this.dy = -Math.abs(this.dy)
-                } else if (ballCenterY > barricade2Y + 200) {
-                    this.dy = Math.abs(this.dy)
-                }
-            }
-            if (this.y < 0 || this.y > 580) {
-                this.dy = -this.dy
-            }
-            if (this.x > 980) {
-                this.dx = -this.dx
-            }
-            for (let i = 0; i < row; i++) {
-                for (let j = -1; j < brickPerRow; j++) {
-                    let brick = $('.brick' + '-' + i + '-' + j);
-                    let y_brick = brick.position().top;
-                    let x_brick = (j === -1) ? 748 : brick.position().left;
-                    if (!brick.hasClass("active") && brick.css("opacity") !== "0") {
-                        if (this.x + this.size >= x_brick && this.x <= x_brick + 40
-                            && this.y + this.size >= y_brick && this.y <= y_brick + 58) {
-                            const ballCenterX = this.x + this.size / 2;
-                            const ballCenterY = this.y + this.size / 2;
-                            if (ballCenterX < x_brick) {
-                                this.dx = -Math.abs(this.dx)
-                                if (j !== -1) {
-                                    brick.addClass("active")
-                                }
-                            } else if (ballCenterX > x_brick + 40) {
-                                this.dx = Math.abs(this.dx)
-                                if (j !== -1) {
-                                    brick.addClass("active")
-                                }
-                            }
-                            if (ballCenterY < y_brick) {
-                                this.dy = -Math.abs(this.dy)
-                                if (j !== -1) {
-                                    brick.addClass("active")
-                                }
-                            } else if (ballCenterY > y_brick + 58) {
-                                this.dy = Math.abs(this.dy)
-                                if (j !== -1) {
-                                    brick.addClass("active")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            $('#ball').css('left', (this.x + this.dx) + "px");
-            this.x += this.dx
-            $('#ball').css('top', (this.y + this.dy) + "px");
-            this.y += this.dy
+            this.collisionBarricade(barricade1X, barricade1Y, 20, 200)
+            this.collisionBarricade(barricade2X, barricade2Y, 20, 200)
+
+            this.collisionScreen();
+            this.collisionWith2TimeBrick(brickPerRow, row, -1)
+            this.updatePosition();
+        }
+
+        // hàm vẽ chế độ phá gạch level 4
+        drawMode5(paddle1, brickPerRow, row, numb) {
+            let paddle1Y = parseInt(paddle1.css('top').substring(0, paddle1.css('top').indexOf('px')));
+            let barricade1X = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
+            let barricade2X = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
+            let barricade1Y = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
+            let barricade2Y = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
+            // Kiểm tra khi va chạm với thanh chắn trái
+            this.checkCollisionBrickMode(paddle1Y)
+
+            this.collisionBarricade(barricade1X, barricade1Y, 20, 200)
+            this.collisionBarricade(barricade2X, barricade2Y, 20, 200)
+
+            this.collisionScreen();
+            this.collisionWith2TimeBrick(brickPerRow, row, -2)
+            this.updatePosition()
+        }
+    }
+
+    // Khi va chạm, thì phải va chạm thêm 1 lần nữa thì mới phá được gạch, cho level 4 và 5
+    function addCracked(brick) {
+        if (brick.hasClass("not-break-yet")) {
+            let img = $(`<img src="img/cracked.jpg"/>`)
+            brick.empty().append(img)
+            brick.removeClass("not-break-yet")
+        } else {
+            brick.addClass("active")
         }
     }
 </script>
