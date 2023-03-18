@@ -33,9 +33,8 @@
             position: absolute;
             width: 10px;
             height: 100px;
-            background-color: white;
-            border: 1px solid gray;
-            border-radius: 5px;
+            background: url("img/paddle.png");
+            border-radius: 7px;
         }
 
         #p1-paddle {
@@ -171,7 +170,7 @@
         <div class="choose">
             <h4>Choose Mode</h4>
             <div class="button" id="mode0" onclick="mode0()"><p>2 Players</p></div>
-            <div class="button" id="mode1" onclick="mode1()"><p>Clear barricade</p></div>
+            <div class="button" id="mode1" onclick="mode1()"><p>Clear Bricks</p></div>
         </div>
     </div>
 </div>
@@ -194,7 +193,7 @@
         $(".game").empty().append(`  <div class="choose">
             <h4>Choose Mode</h4>
             <div class="button" id="mode0" onclick="mode0()"><p>2 Players</p></div>
-            <div class="button" id="mode1" onclick="mode1()"><p>Clear barricade</p></div>
+            <div class="button" id="mode1" onclick="mode1()"><p>Clear Bricks</p></div>
         </div>`)
     }
 
@@ -220,30 +219,25 @@
                 case 40:
                     speed2 = 2
                     break;
-
             }
         }
 
         // sự kiện khi nhả phím
         function keyUp(e) {
-            if (e.keyCode === 87 || e.keyCode === 83) {
+            if (e.keyCode === 87 || e.keyCode === 83)
                 speed1 = 0
-            }
-            if (e.keyCode === 38 || e.keyCode === 40) {
+            if (e.keyCode === 38 || e.keyCode === 40)
                 speed2 = 0
-            }
         }
 
         // gán lặp để vẽ khi các paddle thay đổi vị trí
         moveInt = setInterval(function () {
             let pos1 = parseInt($("#p1-paddle").css("top").substring(0, $("#p1-paddle").css("top").indexOf('px')));
             let pos2 = parseInt($("#p2-paddle").css("top").substring(0, $("#p2-paddle").css("top").indexOf('px')));
-            if (pos1 + speed1 > 0 && pos1 + speed1 < 498) {
+            if (pos1 + speed1 > 0 && pos1 + speed1 < 498)
                 pos1 += speed1
-            }
-            if (pos2 + speed2 > 0 && pos2 + speed2 < 498) {
+            if (pos2 + speed2 > 0 && pos2 + speed2 < 498)
                 pos2 += speed2
-            }
             $("#p1-paddle").css('top', pos1 + 'px');
             $("#p2-paddle").css('top', pos2 + 'px');
         }, 1)
@@ -268,17 +262,15 @@
 
         // sự kiện khi nhả phím
         function keyUp(e) {
-            if (e.keyCode === 87 || e.keyCode === 83) {
+            if (e.keyCode === 87 || e.keyCode === 83)
                 speed1 = 0
-            }
         }
 
         // gán lặp để vẽ khi các paddle thay đổi vị trí
         moveInt = setInterval(function () {
             let pos1 = parseInt($("#p1-paddle").css("top").substring(0, $("#p1-paddle").css("top").indexOf('px')));
-            if (pos1 + speed1 > 0 && pos1 + speed1 < 498) {
+            if (pos1 + speed1 > 0 && pos1 + speed1 < 498)
                 pos1 += speed1
-            }
             $("#p1-paddle").css('top', pos1 + 'px');
         }, 1)
     }
@@ -299,12 +291,7 @@
     // tạo ball với góc phát ngẫu nhiên (game play 2 người)
     function randomNewmBall() {
         let first = Math.random() < 0.5 ? -1 : 1;
-        let startAngle;
-        if (first === -1) {
-            startAngle = getBallComingAngle(Math.random() * 30 + 30)
-        } else {
-            startAngle = getBallComingAngle(Math.random() * 30 + 210)
-        }
+        let startAngle = (first === -1) ? getBallComingAngle(Math.random() * 30 + 30) : getBallComingAngle(Math.random() * 30 + 210);
         return new Ball(screenSize.width / 2, screenSize.height / 2, startAngle[0] * 3, startAngle[1] * 3, 20)
     }
 
@@ -331,9 +318,8 @@
                     `)
                     clearInterval(start)
                     clearInterval(moveInt)
-                } else {
+                } else
                     ball = randomNewBallMode1();
-                }
             }
             if ($(".active").length === 50) {
                 $(".game").css('opacity', '0.7')
@@ -373,9 +359,8 @@
                     `)
                     clearInterval(start)
                     clearInterval(moveInt)
-                } else {
+                } else
                     ball = randomNewBallMode1();
-                }
             }
             if ($(".active").length === 50) {
                 $(".game").css('opacity', '0.7')
@@ -397,19 +382,14 @@
         $("#ball").css("left", "20%");
         let ball = randomNewBallMode1();
         move1();
-        let OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
-        let OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
+        let OldX1, OldX2
+        let barricadeX1 = OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
+        let barricadeX2 = OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
         let dx1 = -1;
         let dx2 = 1;
         let movingBarricade = setInterval(function () {
-            let barricadeX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
-            let barricadeX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
-            if (barricadeX1 < OldX1 - 100 || barricadeX1 > OldX1 + 100) {
-                dx1 = -dx1
-            }
-            if (barricadeX2 < OldX2 - 100 || barricadeX2 > OldX2 + 100) {
-                dx2 = -dx2
-            }
+            dx1 = (barricadeX1 < OldX1 - 100 || barricadeX1 > OldX1 + 100) ? -dx1 : dx1
+            dx2 = (barricadeX2 < OldX2 - 100 || barricadeX2 > OldX2 + 100) ? -dx2 : dx2
             barricadeX1 += dx1;
             barricadeX2 += dx2;
             $("#barricade-1").css('left', barricadeX1)
@@ -434,9 +414,8 @@
                     clearInterval(start)
                     clearInterval(moveInt)
                     clearInterval(movingBarricade)
-                } else {
+                } else
                     ball = randomNewBallMode1();
-                }
             }
             if ($(".active").length === 50) {
                 $(".game").css('opacity', '0.7')
@@ -461,49 +440,20 @@
         let ball1 = randomNewBallMode1();
         let ball2 = randomNewBallMode1();
         move1();
-        let OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
-        let OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
-        let OldY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
-        let OldY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
-        let barricadeX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
-        let barricadeX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
-        let barricadeY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
-        let barricadeY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
+        let OldX1, OldX2, OldY1, OldY2;
+        let barricadeX1 = OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
+        let barricadeX2 = OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
+        let barricadeY1 = OldY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
+        let barricadeY2 = OldY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
         let dx1 = -1;
         let dx2 = 1;
         let dy1 = 0;
         let dy2 = 0;
         let movingBarricade = setInterval(function () {
-            if (barricadeX1 < OldX1 - 100) {
-                dx1 = 0
-                dy1 = 1
-                if (barricadeY1 > OldY2) {
-                    dx1 = 1
-                    dy1 = 0
-                }
-            } else if (barricadeX1 > OldX1 + 100) {
-                dx1 = 0
-                dy1 = -1
-                if (barricadeY1 < OldY1) {
-                    dx1 = -1
-                    dy1 = 0
-                }
-            }
-            if (barricadeX2 < OldX2 - 100) {
-                dx2 = 0
-                dy2 = 1
-                if (barricadeY2 > OldY2) {
-                    dx2 = 1
-                    dy2 = 0
-                }
-            } else if (barricadeX2 > OldX2 + 100) {
-                dx2 = 0
-                dy2 = -1
-                if (barricadeY2 < OldY1) {
-                    dx2 = -1
-                    dy2 = 0
-                }
-            }
+            dx1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 1 : 0 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? -1 : 0 : dx1;
+            dy1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 0 : 1 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? 0 : -1 : dy1;
+            dx2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 1 : 0 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? -1 : 0 : dx2;
+            dy2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 0 : 1 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? 0 : -1 : dy2;
             barricadeX1 += dx1;
             barricadeY1 += dy1;
             barricadeX2 += dx2;
@@ -559,49 +509,20 @@
     function gameplay5(x, y) {
         let ball1 = randomNewBallMode1();
         move1();
-        let OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
-        let OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
-        let OldY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
-        let OldY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
-        let barricadeX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
-        let barricadeX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
-        let barricadeY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
-        let barricadeY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
+        let OldX1, OldX2, OldY1, OldY2;
+        let barricadeX1 = OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
+        let barricadeX2 = OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
+        let barricadeY1 = OldY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
+        let barricadeY2 = OldY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
         let dx1 = -1;
         let dx2 = 1;
         let dy1 = 0;
         let dy2 = 0;
         let movingBarricade = setInterval(function () {
-            if (barricadeX1 < OldX1 - 100) {
-                dx1 = 0
-                dy1 = 1
-                if (barricadeY1 > OldY2) {
-                    dx1 = 1
-                    dy1 = 0
-                }
-            } else if (barricadeX1 > OldX1 + 100) {
-                dx1 = 0
-                dy1 = -1
-                if (barricadeY1 < OldY1) {
-                    dx1 = -1
-                    dy1 = 0
-                }
-            }
-            if (barricadeX2 < OldX2 - 100) {
-                dx2 = 0
-                dy2 = 1
-                if (barricadeY2 > OldY2) {
-                    dx2 = 1
-                    dy2 = 0
-                }
-            } else if (barricadeX2 > OldX2 + 100) {
-                dx2 = 0
-                dy2 = -1
-                if (barricadeY2 < OldY1) {
-                    dx2 = -1
-                    dy2 = 0
-                }
-            }
+            dx1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 1 : 0 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? -1 : 0 : dx1;
+            dy1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 0 : 1 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? 0 : -1 : dy1;
+            dx2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 1 : 0 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? -1 : 0 : dx2;
+            dy2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 0 : 1 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? 0 : -1 : dy2;
             barricadeX1 += dx1;
             barricadeY1 += dy1;
             barricadeX2 += dx2;
@@ -991,6 +912,7 @@
                 let newBallSpeed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
                 this.dx = newBallSpeed * Math.cos(angle);
                 this.dy = newBallSpeed * -Math.sin(angle);
+
                 pongPaddle();
             }
         }
@@ -1146,9 +1068,9 @@
             if (paddle2Y <= this.y + this.size && this.y <= paddle2Y + 100
                 && this.x + this.size >= screenSize.width - 10) {
                 let angle;
-                // vị trí giao nhau tại x của paddle1 và bóng
+                // vị trí giao nhau tại x của paddle2 và bóng
                 let intersectX = paddle2X;
-                // vị trí giao nhau tại y của paddle1 và bóng
+                // vị trí giao nhau tại y của paddle2 và bóng
                 let intersectY = this.y + this.size;
                 // giao điểm tương đối từ trung điểm của paddle tới giao điểm y
                 let relativeIntersectY = (paddle2Y + 100 / 2) - intersectY;
