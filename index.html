@@ -122,8 +122,31 @@
         .p1_life {
             display: flex;
             position: absolute;
-            top: 3%;
+            top: 2%;
             left: 2%;
+        }
+
+        .buttons {
+            display: flex;
+            position: absolute;
+            bottom: 2%;
+            left: 2%;
+            z-index: 9999;
+        }
+
+        .home, .pause {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .home {
+            background: url('img/home.png');
+        }
+
+        .pause {
+            background: url('img/pause.png');
         }
 
         .brick {
@@ -228,6 +251,7 @@
     }
     let moveInt;
     let start;
+    let currentPos = [];
 
     // Di chuyển bằng chuột
     function mouseMove() {
@@ -342,7 +366,7 @@
                             </div>
                         `)
                     clearInterval(start)
-                    clearInterval(moveInt)
+                    $(".game").unbind("mousemove")
                 } else
                     ball = randomNewBallMode1();
             }
@@ -357,9 +381,60 @@
                             </div>
                         `)
                 clearInterval(start)
-                clearInterval(moveInt)
+                $(".game").unbind("mousemove")
             }
         }, 1)
+        $(".home").on('click', function (e) {
+            clearInterval(start)
+            $(".game").unbind("mousemove")
+            go_back()
+        })
+        $(".pause").on('click', function (e) {
+            if (!$(".pause").hasClass("start")) {
+                $(".pause").css("background", "url('img/play.png')")
+                clearInterval(start)
+                $(".game").unbind("mousemove")
+                $(".pause").addClass("start");
+            } else {
+                $(".pause").css("background", "url('img/pause.png')")
+                start = setInterval(function () {
+                    ball.drawMode1($("#p1-paddle"), x, y)
+                    if (ball.x < 0) {
+                        // giảm life người chơi nếu bóng ra khỏi vùng biên
+                        $('.p1_life .heart:last-child').remove();
+                        // thua cuộc nếu hết mạng
+                        if ($('.p1_life').children().length === 0) {
+                            $(".game").css('opacity', '0.7')
+                            $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level0()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                            clearInterval(start)
+                            $(".game").unbind("mousemove")
+                        } else
+                            ball = randomNewBallMode1();
+                    }
+                    if ($(".active").length === 40) {
+                        // nếu clear all gạch thì chiến thắng
+                        $(".game").css('opacity', '0.7')
+                        $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level0()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                        clearInterval(start)
+                        $(".game").unbind("mousemove")
+                    }
+                }, 1)
+                mouseMove()
+                $(".pause").removeClass("start");
+            }
+        })
     }
 
     // gameplay cho chế độ phá gạch với level 1
@@ -384,7 +459,7 @@
                             </div>
                         `)
                     clearInterval(start)
-                    clearInterval(moveInt)
+                    $(".game").unbind("mousemove")
                 } else
                     ball = randomNewBallMode1();
             }
@@ -399,9 +474,61 @@
                             </div>
                         `)
                 clearInterval(start)
-                clearInterval(moveInt)
+                $(".game").unbind("mousemove")
             }
         }, 1)
+
+        $(".home").on('click', function (e) {
+            clearInterval(start)
+            $(".game").unbind("mousemove")
+            go_back()
+        })
+        $(".pause").on('click', function (e) {
+            if (!$(".pause").hasClass("start")) {
+                $(".pause").css("background", "url('img/play.png')")
+                clearInterval(start)
+                $(".game").unbind("mousemove")
+                $(".pause").addClass("start");
+            } else {
+                $(".pause").css("background", "url('img/pause.png')")
+                start = setInterval(function () {
+                    ball.drawMode2($("#p1-paddle"), x, y)
+                    if (ball.x < 0) {
+                        // giảm life người chơi nếu bóng ra khỏi vùng biên
+                        $('.p1_life .heart:last-child').remove();
+                        if ($('.p1_life').children().length === 0) {
+                            // thua cuộc nếu hết mạng
+                            $(".game").css('opacity', '0.7')
+                            $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level1()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                            clearInterval(start)
+                            $(".game").unbind("mousemove")
+                        } else
+                            ball = randomNewBallMode1();
+                    }
+                    if ($(".active").length === 40) {
+                        // nếu clear all gạch thì chiến thắng
+                        $(".game").css('opacity', '0.7')
+                        $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level1()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                        clearInterval(start)
+                        $(".game").unbind("mousemove")
+                    }
+                }, 1)
+                mouseMove()
+                $(".pause").removeClass("start");
+            }
+        })
     }
 
     // gameplay cho chế độ phá gạch với level 2
@@ -440,7 +567,7 @@
                             </div>
                         `)
                     clearInterval(start)
-                    clearInterval(moveInt)
+                    $(".game").unbind("mousemove")
                     clearInterval(movingBarricade)
                 } else
                     ball = randomNewBallMode1();
@@ -456,10 +583,74 @@
                             </div>
                         `)
                 clearInterval(start)
-                clearInterval(moveInt)
+                $(".game").unbind("mousemove")
                 clearInterval(movingBarricade)
             }
         }, 1)
+
+        $(".home").on('click', function (e) {
+            clearInterval(start)
+            clearInterval(movingBarricade)
+            $(".game").unbind("mousemove")
+            go_back()
+        })
+        $(".pause").on('click', function (e) {
+            if (!$(".pause").hasClass("start")) {
+                $(".pause").css("background", "url('img/play.png')")
+                clearInterval(start)
+                clearInterval(movingBarricade)
+                $(".game").unbind("mousemove")
+                $(".pause").addClass("start");
+            } else {
+                $(".pause").css("background", "url('img/pause.png')")
+                start = setInterval(function () {
+                    ball.drawMode3($("#p1-paddle"), x, y)
+                    if (ball.x < 0) {
+                        // giảm life người chơi nếu bóng ra khỏi vùng biên
+                        $('.p1_life .heart:last-child').remove();
+                        if ($('.p1_life').children().length === 0) {
+                            // thua cuộc nếu hết mạng
+                            $(".game").css('opacity', '0.7')
+                            $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level2()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                            clearInterval(start)
+                            $(".game").unbind("mousemove")
+                            clearInterval(movingBarricade)
+                        } else
+                            ball = randomNewBallMode1();
+                    }
+                    if ($(".active").length === 40) {
+                        // nếu clear all gạch thì chiến thắng
+                        $(".game").css('opacity', '0.7')
+                        $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level2()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                        clearInterval(start)
+                        $(".game").unbind("mousemove")
+                        clearInterval(movingBarricade)
+                    }
+                }, 1)
+                movingBarricade = setInterval(function () {
+                    dx1 = (barricadeX1 < OldX1 - 100 || barricadeX1 > OldX1 + 100) ? -dx1 : dx1
+                    dx2 = (barricadeX2 < OldX2 - 100 || barricadeX2 > OldX2 + 100) ? -dx2 : dx2
+                    barricadeX1 += dx1;
+                    barricadeX2 += dx2;
+                    $("#barricade-1").css('left', barricadeX1)
+                    $("#barricade-2").css('left', barricadeX2)
+                }, 1)
+                mouseMove()
+                $(".pause").removeClass("start");
+            }
+        })
     }
 
     // gameplay cho chế độ phá gạch với level 3
@@ -507,7 +698,7 @@
                             </div>
                         `)
                     clearInterval(start)
-                    clearInterval(moveInt)
+                    $(".game").unbind("mousemove")
                     clearInterval(movingBarricade)
                 } else {
                     ball1 = randomNewBallMode1();
@@ -524,10 +715,81 @@
                             </div>
                         `)
                 clearInterval(start)
-                clearInterval(moveInt)
+                $(".game").unbind("mousemove")
                 clearInterval(movingBarricade)
             }
         }, 1)
+
+        $(".home").on('click', function (e) {
+            clearInterval(start)
+            clearInterval(movingBarricade)
+            $(".game").unbind("mousemove")
+            go_back()
+        })
+        $(".pause").on('click', function (e) {
+            if (!$(".pause").hasClass("start")) {
+                $(".pause").css("background", "url('img/play.png')")
+                clearInterval(start)
+                clearInterval(movingBarricade)
+                $(".game").unbind("mousemove")
+                $(".pause").addClass("start");
+            } else {
+                $(".pause").css("background", "url('img/pause.png')")
+                start = setInterval(function () {
+                    ball1.drawMode4($("#p1-paddle"), x, y, 1)
+                    if (ball1.x < 0) {
+                        // giảm life người chơi nếu bóng ra khỏi vùng biên
+                        $('.p1_life .heart:last-child').remove();
+                        if ($('.p1_life').children().length === 0) {
+                            // thua cuộc nếu hết mạng
+                            $(".game").css('opacity', '0.7')
+                            $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level3()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                            clearInterval(start)
+                            $(".game").unbind("mousemove")
+                            clearInterval(movingBarricade)
+                        } else {
+                            ball1 = randomNewBallMode1();
+                        }
+                    }
+                    if ($(".active").length === 40) {
+                        // nếu clear all gạch thì chiến thắng
+                        $(".game").css('opacity', '0.7')
+                        $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level3()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                        clearInterval(start)
+                        $(".game").unbind("mousemove")
+                        clearInterval(movingBarricade)
+                    }
+                }, 1)
+                movingBarricade = setInterval(function () {
+                    dx1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 1 : 0 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? -1 : 0 : dx1;
+                    dy1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 0 : 1 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? 0 : -1 : dy1;
+                    dx2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 1 : 0 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? -1 : 0 : dx2;
+                    dy2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 0 : 1 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? 0 : -1 : dy2;
+                    barricadeX1 += dx1;
+                    barricadeY1 += dy1;
+                    barricadeX2 += dx2;
+                    barricadeY2 += dy2;
+                    $("#barricade-1").css('left', barricadeX1)
+                    $("#barricade-2").css('left', barricadeX2)
+                    $("#barricade-1").css('top', barricadeY1)
+                    $("#barricade-2").css('top', barricadeY2)
+                }, 1)
+                mouseMove()
+                $(".pause").removeClass("start");
+            }
+        })
     }
 
     // gameplay cho chế độ phá gạch với level 4
@@ -575,7 +837,7 @@
                             </div>
                         `)
                     clearInterval(start)
-                    clearInterval(moveInt)
+                    $(".game").unbind("mousemove")
                     clearInterval(movingBarricade)
                 } else {
                     ball1 = randomNewBallMode1();
@@ -592,10 +854,81 @@
                             </div>
                         `)
                 clearInterval(start)
-                clearInterval(moveInt)
+                $(".game").unbind("mousemove")
                 clearInterval(movingBarricade)
             }
         }, 1)
+
+        $(".home").on('click', function (e) {
+            clearInterval(start)
+            clearInterval(movingBarricade)
+            $(".game").unbind("mousemove")
+            go_back()
+        })
+        $(".pause").on('click', function (e) {
+            if (!$(".pause").hasClass("start")) {
+                $(".pause").css("background", "url('img/play.png')")
+                clearInterval(start)
+                clearInterval(movingBarricade)
+                $(".game").unbind("mousemove")
+                $(".pause").addClass("start");
+            } else {
+                $(".pause").css("background", "url('img/pause.png')")
+                start = setInterval(function () {
+                    ball1.drawMode5($("#p1-paddle"), x, y, 1)
+                    if (ball1.x < 0) {
+                        // giảm life người chơi nếu bóng ra khỏi vùng biên
+                        $('.p1_life .heart:last-child').remove();
+                        if ($('.p1_life').children().length === 0) {
+                            // thua cuộc nếu hết mạng
+                            $(".game").css('opacity', '0.7')
+                            $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level4()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                            clearInterval(start)
+                            $(".game").unbind("mousemove")
+                            clearInterval(movingBarricade)
+                        } else {
+                            ball1 = randomNewBallMode1();
+                        }
+                    }
+                    if ($(".active").length === 40) {
+                        // nếu clear all gạch thì chiến thắng
+                        $(".game").css('opacity', '0.7')
+                        $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level4()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                        clearInterval(start)
+                        $(".game").unbind("mousemove")
+                        clearInterval(movingBarricade)
+                    }
+                }, 1)
+                movingBarricade = setInterval(function () {
+                    dx1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 1 : 0 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? -1 : 0 : dx1;
+                    dy1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 0 : 1 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? 0 : -1 : dy1;
+                    dx2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 1 : 0 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? -1 : 0 : dx2;
+                    dy2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 0 : 1 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? 0 : -1 : dy2;
+                    barricadeX1 += dx1;
+                    barricadeY1 += dy1;
+                    barricadeX2 += dx2;
+                    barricadeY2 += dy2;
+                    $("#barricade-1").css('left', barricadeX1)
+                    $("#barricade-2").css('left', barricadeX2)
+                    $("#barricade-1").css('top', barricadeY1)
+                    $("#barricade-2").css('top', barricadeY2)
+                }, 1)
+                mouseMove()
+                $(".pause").removeClass("start");
+            }
+        })
     }
 
     // gameplay cho chế độ phá gạch với level 5
@@ -643,7 +976,7 @@
                             </div>
                         `)
                     clearInterval(start)
-                    clearInterval(moveInt)
+                    $(".game").unbind("mousemove")
                     clearInterval(movingBarricade)
                 } else
                     ball1 = randomNewBallMode1();
@@ -659,10 +992,80 @@
                             </div>
                         `)
                 clearInterval(start)
-                clearInterval(moveInt)
+                $(".game").unbind("mousemove")
                 clearInterval(movingBarricade)
             }
         }, 1)
+
+        $(".home").on('click', function (e) {
+            clearInterval(start)
+            clearInterval(movingBarricade)
+            $(".game").unbind("mousemove")
+            go_back()
+        })
+        $(".pause").on('click', function (e) {
+            if (!$(".pause").hasClass("start")) {
+                $(".pause").css("background", "url('img/play.png')")
+                clearInterval(start)
+                clearInterval(movingBarricade)
+                $(".game").unbind("mousemove")
+                $(".pause").addClass("start");
+            } else {
+                $(".pause").css("background", "url('img/pause.png')")
+                start = setInterval(function () {
+                    ball1.drawMode6($("#p1-paddle"), x, y, 1)
+                    if (ball1.x < 0) {
+                        // giảm life người chơi nếu bóng ra khỏi vùng biên
+                        $('.p1_life .heart:last-child').remove();
+                        if ($('.p1_life').children().length === 0) {
+                            // thua cuộc nếu hết mạng
+                            $(".game").css('opacity', '0.7')
+                            $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level5()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                            clearInterval(start)
+                            $(".game").unbind("mousemove")
+                            clearInterval(movingBarricade)
+                        } else
+                            ball1 = randomNewBallMode1();
+                    }
+                    if ($(".active").length === 40) {
+                        // nếu clear all gạch thì chiến thắng
+                        $(".game").css('opacity', '0.7')
+                        $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level5()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                        clearInterval(start)
+                        $(".game").unbind("mousemove")
+                        clearInterval(movingBarricade)
+                    }
+                }, 1)
+                movingBarricade = setInterval(function () {
+                    dx1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 1 : 0 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? -1 : 0 : dx1;
+                    dy1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 0 : 1 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? 0 : -1 : dy1;
+                    dx2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 1 : 0 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? -1 : 0 : dx2;
+                    dy2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 0 : 1 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? 0 : -1 : dy2;
+                    barricadeX1 += dx1;
+                    barricadeY1 += dy1;
+                    barricadeX2 += dx2;
+                    barricadeY2 += dy2;
+                    $("#barricade-1").css('left', barricadeX1)
+                    $("#barricade-2").css('left', barricadeX2)
+                    $("#barricade-1").css('top', barricadeY1)
+                    $("#barricade-2").css('top', barricadeY2)
+                }, 1)
+                mouseMove()
+                $(".pause").removeClass("start");
+            }
+        })
     }
 
     // bắt đầu game chế đọ 2 người
@@ -699,6 +1102,52 @@
                 }
             }
         }, 1)
+        $(".home").on('click', function () {
+            clearInterval(start)
+            clearInterval(moveInt)
+            go_back()
+        })
+        $(".pause").on('click', function () {
+            if (!$(".pause").hasClass("start")) {
+                $(".pause").css("background", "url('img/play.png')")
+                clearInterval(start)
+                clearInterval(moveInt)
+                $(".pause").addClass("start");
+            } else {
+                $(".pause").css("background", "url('img/pause.png')")
+                start = setInterval(function () {
+                    ball.draw2Player($("#p1-paddle"), $("#p2-paddle"))
+                    // reset lại game mỗi khi bóng out khỏi vùng game
+                    if (ball.x < 0 || ball.x > screenSize.width - ball.size) {
+                        let p1_score = parseInt($('.p1-score').text());
+                        let p2_score = parseInt($('.p2-score').text());
+                        if (ball.x < 0) {
+                            p2_score += 1;
+                            $('.p2-score').text(p2_score);
+                        } else if (ball.x > screenSize.width - ball.size) {
+                            p1_score += 1;
+                            $('.p1-score').text(p1_score);
+                        }
+                        if (p1_score === 5 || p2_score === 5) {
+                            $(".game").css('opacity', '0.7')
+                            $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>Player ` + (p1_score === 5 ? `1` : `2`) + ` Won !</h3>
+                                <div class="button" id="restart" onclick="mode0()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                            clearInterval(start)
+                            clearInterval(moveInt)
+                        } else {
+                            ball = randomNewmBall();
+                        }
+                    }
+                }, 1)
+                move()
+                $(".pause").removeClass("start");
+            }
+        })
     }
 
     // chọn mode 1 thì hiển thị các level để chọn
@@ -725,6 +1174,10 @@
                 <div id="p2-paddle"></div>
                 <div class="score p1-score">0</div>
                 <div class="score p2-score">0</div>
+                <div class="buttons">
+                    <div class="home"></div>
+                    <div class="pause"></div>
+                </div>
             `);
         restart();
     }
@@ -740,7 +1193,11 @@
                     <div class="heart"></div>
                 </div>
                 <div id="p1-paddle"></div>
-                <div id="ball"></div>`
+                <div id="ball"></div>
+                <div class="buttons">
+                    <div class="home"></div>
+                    <div class="pause"></div>
+                </div>`
         );
         const noOfBricksPerRow = 4;
         const noOfRows = 10;
@@ -772,14 +1229,19 @@
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
         $(".game").empty().append(`
-                  <div class="p1_life">
+                 <div class="p1_life">
                     <div class="heart"></div>
                     <div class="heart"></div>
                     <div class="heart"></div>
                 </div>
+                <div class="buttons">
+                    <div class="home"></div>
+                    <div class="pause"></div>
+                </div>
                 <div id="p1-paddle"></div>
                 <div id="barricade-1" class="barricade"></div>
                 <div id="barricade-2" class="barricade"></div>
+
                 <div id="ball"></div>`
         );
         const noOfBricksPerRow = 4;
@@ -816,6 +1278,10 @@
                     <div class="heart"></div>
                     <div class="heart"></div>
                     <div class="heart"></div>
+                </div>
+                <div class="buttons">
+                    <div class="home"></div>
+                    <div class="pause"></div>
                 </div>
                 <div id="p1-paddle"></div>
                 <div id="barricade-1" class="barricade"></div>
@@ -856,6 +1322,10 @@
                     <div class="heart"></div>
                     <div class="heart"></div>
                     <div class="heart"></div>
+                </div>
+                <div class="buttons">
+                    <div class="home"></div>
+                    <div class="pause"></div>
                 </div>
                 <div id="p1-paddle"></div>
                 <div id="barricade-1" class="barricade"></div>
@@ -909,6 +1379,10 @@
                     <div class="heart"></div>
                     <div class="heart"></div>
                 </div>
+                <div class="buttons">
+                    <div class="home"></div>
+                    <div class="pause"></div>
+                </div>
                 <div id="p1-paddle"></div>
                 <div id="barricade-1" class="barricade"></div>
                 <div id="barricade-2" class="barricade"></div>
@@ -959,6 +1433,10 @@
                     <div class="heart"></div>
                     <div class="heart"></div>
                     <div class="heart"></div>
+                </div>
+                <div class="buttons">
+                    <div class="home"></div>
+                    <div class="pause"></div>
                 </div>
                 <div id="p1-paddle"></div>
                 <div id="barricade-1" class="barricade"></div>
