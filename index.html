@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <title>Ping pong game</title>
     <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
     <style>
+        .heart {
+            width: 30px;
+            height: 30px;
+            margin-left: 10px;
+            background: url("img/heart.png");
+        }
+
         #video {
             position: fixed;
             right: 0;
@@ -34,7 +42,7 @@
             width: 10px;
             height: 100px;
             background: url("img/paddle.png");
-            border-radius: 7px;
+            border-radius: 30%;
         }
 
         #p1-paddle {
@@ -64,7 +72,7 @@
             width: 300px;
             text-align: center;
             position: absolute;
-            top: calc(40% - 50px);
+            top: 130px;
             left: calc(50% - 150px);
         }
 
@@ -112,12 +120,10 @@
         }
 
         .p1_life {
-            font-family: Arial, sans-serif;
-            font-size: 25px;
+            display: flex;
             position: absolute;
-            color: rgb(183, 77, 77);
-            top: 10%;
-            left: 5%;
+            top: 3%;
+            left: 2%;
         }
 
         .brick {
@@ -159,6 +165,42 @@
             bottom: 50px;
             left: 48%;
         }
+
+        .glow {
+            margin-top: 20px;
+            font-size: 60px;
+            color: #befff4;
+            text-align: center;
+            animation: glow 1s ease-in-out infinite alternate;
+            font-family: cursive;
+        }
+
+        @-webkit-keyframes glow {
+            from {
+                text-shadow: 0 0 10px #befff4, 0 0 20px #befff4, 0 0 30px #60DAF5FF, 0 0 40px #60DAF5FF, 0 0 50px #60DAF5FF, 0 0 60px #60DAF5FF, 0 0 70px #60DAF5FF;
+            }
+
+            to {
+                text-shadow: 0 0 20px #befff4, 0 0 30px #60DAF5FF, 0 0 40px #60DAF5FF, 0 0 50px #60DAF5FF, 0 0 60px #60DAF5FF, 0 0 70px #60DAF5FF, 0 0 80px #60DAF5FF;
+            }
+        }
+
+        .teleport {
+            position: absolute;
+            width: 20px;
+            height: 100px;
+            background: url("img/portal.png");
+        }
+
+        #teleport1 {
+            top: 10%;
+            left: 20%;
+        }
+
+        #teleport2 {
+            bottom: 10%;
+            left: 20%;
+        }
     </style>
 </head>
 <body>
@@ -167,6 +209,7 @@
 </video>
 <div class="container main">
     <div class="game">
+        <h1 class="glow">Brick Breaker</h1>
         <div class="choose">
             <h4>Choose Mode</h4>
             <div class="button" id="mode0" onclick="mode0()"><p>2 Players</p></div>
@@ -186,19 +229,33 @@
     let moveInt;
     let start;
 
+    // Di chuyển bằng chuột
+    function mouseMove() {
+        $(".game").mousemove(function (e) {
+            let dy = e.pageY;
+            let pos1 = parseInt($("#p1-paddle").css("top").substring(0, $("#p1-paddle").css("top").indexOf('px')));
+            if (dy > 0 && dy < 498)
+                pos1 = dy
+            $("#p1-paddle").css('top', pos1 + 'px');
+        })
+    }
+
     // quay lại menu chính
     function go_back() {
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
-        $(".game").empty().append(`  <div class="choose">
-            <h4>Choose Mode</h4>
-            <div class="button" id="mode0" onclick="mode0()"><p>2 Players</p></div>
-            <div class="button" id="mode1" onclick="mode1()"><p>Clear Bricks</p></div>
-        </div>`)
+        $(".game").empty().append(`
+                <h1 class="glow">Brick Breaker</h1>
+                <div class="choose">
+                <h4>Choose Mode</h4>
+                <div class="button" id="mode0" onclick="mode0()"><p>2 Players</p></div>
+                <div class="button" id="mode1" onclick="mode1()"><p>Clear Bricks</p></div>
+            </div>`)
     }
 
     // di chuyển 2 thanh paddle
     function move() {
+        $('.game').unbind('mousemove');
         let speed1 = 0;
         let speed2 = 0;
         $(document).on('keydown', keyDown);
@@ -208,16 +265,16 @@
         function keyDown(e) {
             switch (e.keyCode) {
                 case 87:
-                    speed1 = -2
+                    speed1 = -4
                     break;
                 case 83:
-                    speed1 = 2
+                    speed1 = 4
                     break;
                 case 38:
-                    speed2 = -2
+                    speed2 = -4
                     break;
                 case 40:
-                    speed2 = 2
+                    speed2 = 4
                     break;
             }
         }
@@ -243,38 +300,6 @@
         }, 1)
     }
 
-    function move1() {
-        let speed1 = 0;
-        $(document).on('keydown', keyDown);
-        $(document).on('keyup', keyUp);
-
-        // sự kiện khi nhấn giữ phím
-        function keyDown(e) {
-            switch (e.keyCode) {
-                case 87:
-                    speed1 = -4
-                    break;
-                case 83:
-                    speed1 = 4
-                    break;
-            }
-        }
-
-        // sự kiện khi nhả phím
-        function keyUp(e) {
-            if (e.keyCode === 87 || e.keyCode === 83)
-                speed1 = 0
-        }
-
-        // gán lặp để vẽ khi các paddle thay đổi vị trí
-        moveInt = setInterval(function () {
-            let pos1 = parseInt($("#p1-paddle").css("top").substring(0, $("#p1-paddle").css("top").indexOf('px')));
-            if (pos1 + speed1 > 0 && pos1 + speed1 < 498)
-                pos1 += speed1
-            $("#p1-paddle").css('top', pos1 + 'px');
-        }, 1)
-    }
-
     // tạo góc phát bóng ban đầu cho ball
     function getBallComingAngle(angle) {
         const rads = angle * Math.PI / 180;
@@ -285,7 +310,7 @@
     function randomNewBallMode1() {
         let startAngle;
         startAngle = getBallComingAngle(Math.random() * 30 + 30)
-        return new Ball(screenSize.width / 5, screenSize.height / 2, startAngle[0] * 3, startAngle[1] * 3, 20)
+        return new Ball(screenSize.width / 5, screenSize.height / 2, startAngle[0] * 5, startAngle[1] * 5, 20)
     }
 
     // tạo ball với góc phát ngẫu nhiên (game play 2 người)
@@ -299,37 +324,38 @@
     function gameplay1(x, y) {
         $("#ball").css("left", "20%");
         let ball = randomNewBallMode1();
-        move1();
+        mouseMove()
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball.drawMode1($("#p1-paddle"), x, y)
             if (ball.x < 0) {
-                let p1_life = parseInt($('.p1_life a').text());
-                p1_life -= 1;
-                $('.p1_life a').text(p1_life);
-                if (p1_life === 0) {
+                // giảm life người chơi nếu bóng ra khỏi vùng biên
+                $('.p1_life .heart:last-child').remove();
+                // thua cuộc nếu hết mạng
+                if ($('.p1_life').children().length === 0) {
                     $(".game").css('opacity', '0.7')
                     $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You lose !</h3>
-                            <div class="button" id="restart" onclick="level0()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level0()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                     clearInterval(start)
                     clearInterval(moveInt)
                 } else
                     ball = randomNewBallMode1();
             }
-            if ($(".active").length === 50) {
+            if ($(".active").length === 40) {
+                // nếu clear all gạch thì chiến thắng
                 $(".game").css('opacity', '0.7')
                 $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You won the game !</h3>
-                            <div class="button" id="restart" onclick="level0()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level0()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                 clearInterval(start)
                 clearInterval(moveInt)
             }
@@ -340,37 +366,38 @@
     function gameplay2(x, y) {
         $("#ball").css("left", "20%");
         let ball = randomNewBallMode1();
-        move1();
+        mouseMove()
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball.drawMode2($("#p1-paddle"), x, y)
             if (ball.x < 0) {
-                let p1_life = parseInt($('.p1_life a').text());
-                p1_life -= 1;
-                $('.p1_life a').text(p1_life);
-                if (p1_life === 0) {
+                // giảm life người chơi nếu bóng ra khỏi vùng biên
+                $('.p1_life .heart:last-child').remove();
+                if ($('.p1_life').children().length === 0) {
+                    // thua cuộc nếu hết mạng
                     $(".game").css('opacity', '0.7')
                     $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You lose !</h3>
-                            <div class="button" id="restart" onclick="level1()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level1()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                     clearInterval(start)
                     clearInterval(moveInt)
                 } else
                     ball = randomNewBallMode1();
             }
-            if ($(".active").length === 50) {
+            if ($(".active").length === 40) {
+                // nếu clear all gạch thì chiến thắng
                 $(".game").css('opacity', '0.7')
                 $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You won the game !</h3>
-                            <div class="button" id="restart" onclick="level1()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level1()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                 clearInterval(start)
                 clearInterval(moveInt)
             }
@@ -381,12 +408,13 @@
     function gameplay3(x, y) {
         $("#ball").css("left", "20%");
         let ball = randomNewBallMode1();
-        move1();
+        mouseMove()
         let OldX1, OldX2
         let barricadeX1 = OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
         let barricadeX2 = OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
         let dx1 = -1;
         let dx2 = 1;
+        // di chuyển các thanh chắn tịnh tiến
         let movingBarricade = setInterval(function () {
             dx1 = (barricadeX1 < OldX1 - 100 || barricadeX1 > OldX1 + 100) ? -dx1 : dx1
             dx2 = (barricadeX2 < OldX2 - 100 || barricadeX2 > OldX2 + 100) ? -dx2 : dx2
@@ -399,33 +427,34 @@
         start = setInterval(function () {
             ball.drawMode3($("#p1-paddle"), x, y)
             if (ball.x < 0) {
-                let p1_life = parseInt($('.p1_life a').text());
-                p1_life -= 1;
-                $('.p1_life a').text(p1_life);
-                if (p1_life === 0) {
+                // giảm life người chơi nếu bóng ra khỏi vùng biên
+                $('.p1_life .heart:last-child').remove();
+                if ($('.p1_life').children().length === 0) {
+                    // thua cuộc nếu hết mạng
                     $(".game").css('opacity', '0.7')
                     $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You lose !</h3>
-                            <div class="button" id="restart" onclick="level2()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level2()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                     clearInterval(start)
                     clearInterval(moveInt)
                     clearInterval(movingBarricade)
                 } else
                     ball = randomNewBallMode1();
             }
-            if ($(".active").length === 50) {
+            if ($(".active").length === 40) {
+                // nếu clear all gạch thì chiến thắng
                 $(".game").css('opacity', '0.7')
                 $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You won the game !</h3>
-                            <div class="button" id="restart" onclick="level2()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level2()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                 clearInterval(start)
                 clearInterval(moveInt)
                 clearInterval(movingBarricade)
@@ -435,11 +464,8 @@
 
     // gameplay cho chế độ phá gạch với level 3
     function gameplay4(x, y) {
-        $(".ball1").css("left", "20%");
-        $(".ball2").css("left", "20%");
         let ball1 = randomNewBallMode1();
-        let ball2 = randomNewBallMode1();
-        move1();
+        mouseMove()
         let OldX1, OldX2, OldY1, OldY2;
         let barricadeX1 = OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
         let barricadeX2 = OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
@@ -449,6 +475,7 @@
         let dx2 = 1;
         let dy1 = 0;
         let dy2 = 0;
+        // di chuyển các thanh chắn tịnh tiến
         let movingBarricade = setInterval(function () {
             dx1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 1 : 0 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? -1 : 0 : dx1;
             dy1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 0 : 1 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? 0 : -1 : dy1;
@@ -466,38 +493,36 @@
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball1.drawMode4($("#p1-paddle"), x, y, 1)
-            if (ball1.x < 0 || ball2.x < 0) {
-                let p1_life = parseInt($('.p1_life a').text());
-                p1_life -= 1;
-                $('.p1_life a').text(p1_life);
-                if (p1_life === 0) {
+            if (ball1.x < 0) {
+                // giảm life người chơi nếu bóng ra khỏi vùng biên
+                $('.p1_life .heart:last-child').remove();
+                if ($('.p1_life').children().length === 0) {
+                    // thua cuộc nếu hết mạng
                     $(".game").css('opacity', '0.7')
                     $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You lose !</h3>
-                            <div class="button" id="restart" onclick="level3()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level3()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                     clearInterval(start)
                     clearInterval(moveInt)
                     clearInterval(movingBarricade)
                 } else {
-                    if (ball1.x < 0)
-                        ball1 = randomNewBallMode1();
-                    if (ball2.x < 0)
-                        ball2 = randomNewBallMode1();
+                    ball1 = randomNewBallMode1();
                 }
             }
-            if ($(".active").length === 50) {
+            if ($(".active").length === 40) {
+                // nếu clear all gạch thì chiến thắng
                 $(".game").css('opacity', '0.7')
                 $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You won the game !</h3>
-                            <div class="button" id="restart" onclick="level3()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level3()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                 clearInterval(start)
                 clearInterval(moveInt)
                 clearInterval(movingBarricade)
@@ -508,7 +533,7 @@
     // gameplay cho chế độ phá gạch với level 4
     function gameplay5(x, y) {
         let ball1 = randomNewBallMode1();
-        move1();
+        mouseMove()
         let OldX1, OldX2, OldY1, OldY2;
         let barricadeX1 = OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
         let barricadeX2 = OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
@@ -518,6 +543,7 @@
         let dx2 = 1;
         let dy1 = 0;
         let dy2 = 0;
+        // di chuyển các thanh chắn tịnh tiến
         let movingBarricade = setInterval(function () {
             dx1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 1 : 0 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? -1 : 0 : dx1;
             dy1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 0 : 1 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? 0 : -1 : dy1;
@@ -536,18 +562,18 @@
         start = setInterval(function () {
             ball1.drawMode5($("#p1-paddle"), x, y, 1)
             if (ball1.x < 0) {
-                let p1_life = parseInt($('.p1_life a').text());
-                p1_life -= 1;
-                $('.p1_life a').text(p1_life);
-                if (p1_life === 0) {
+                // giảm life người chơi nếu bóng ra khỏi vùng biên
+                $('.p1_life .heart:last-child').remove();
+                if ($('.p1_life').children().length === 0) {
+                    // thua cuộc nếu hết mạng
                     $(".game").css('opacity', '0.7')
                     $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You lose !</h3>
-                            <div class="button" id="restart" onclick="level4()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level4()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                     clearInterval(start)
                     clearInterval(moveInt)
                     clearInterval(movingBarricade)
@@ -555,15 +581,16 @@
                     ball1 = randomNewBallMode1();
                 }
             }
-            if ($(".active").length === 60) {
+            if ($(".active").length === 40) {
+                // nếu clear all gạch thì chiến thắng
                 $(".game").css('opacity', '0.7')
                 $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>You won the game !</h3>
-                            <div class="button" id="restart" onclick="level4()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level4()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                 clearInterval(start)
                 clearInterval(moveInt)
                 clearInterval(movingBarricade)
@@ -571,7 +598,74 @@
         }, 1)
     }
 
-    // bắt đầu game che do 2 nguoi
+    // gameplay cho chế độ phá gạch với level 5
+    function gameplay6(x, y) {
+        let ball1 = randomNewBallMode1();
+        let OldX1, OldX2, OldY1, OldY2;
+        let barricadeX1 = OldX1 = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
+        let barricadeX2 = OldX2 = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
+        let barricadeY1 = OldY1 = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
+        let barricadeY2 = OldY2 = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
+        let dx1 = -1;
+        let dx2 = 1;
+        let dy1 = 0;
+        let dy2 = 0;
+        // di chuyển các thanh chắn tịnh tiến
+        let movingBarricade = setInterval(function () {
+            dx1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 1 : 0 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? -1 : 0 : dx1;
+            dy1 = barricadeX1 < OldX1 - 100 ? barricadeY1 > OldY2 ? 0 : 1 : barricadeX1 > OldX1 + 100 ? barricadeY1 < OldY1 ? 0 : -1 : dy1;
+            dx2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 1 : 0 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? -1 : 0 : dx2;
+            dy2 = barricadeX2 < OldX2 - 100 ? barricadeY2 > OldY2 ? 0 : 1 : barricadeX2 > OldX2 + 100 ? barricadeY2 < OldY1 ? 0 : -1 : dy2;
+            barricadeX1 += dx1;
+            barricadeY1 += dy1;
+            barricadeX2 += dx2;
+            barricadeY2 += dy2;
+            $("#barricade-1").css('left', barricadeX1)
+            $("#barricade-2").css('left', barricadeX2)
+            $("#barricade-1").css('top', barricadeY1)
+            $("#barricade-2").css('top', barricadeY2)
+        }, 1)
+        mouseMove()
+        // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
+        start = setInterval(function () {
+            ball1.drawMode6($("#p1-paddle"), x, y, 1)
+            if (ball1.x < 0) {
+                // giảm life người chơi nếu bóng ra khỏi vùng biên
+                $('.p1_life .heart:last-child').remove();
+                if ($('.p1_life').children().length === 0) {
+                    // thua cuộc nếu hết mạng
+                    $(".game").css('opacity', '0.7')
+                    $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You lose !</h3>
+                                <div class="button" id="restart" onclick="level5()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                    clearInterval(start)
+                    clearInterval(moveInt)
+                    clearInterval(movingBarricade)
+                } else
+                    ball1 = randomNewBallMode1();
+            }
+            if ($(".active").length === 40) {
+                // nếu clear all gạch thì chiến thắng
+                $(".game").css('opacity', '0.7')
+                $(".container.main").append(`
+                            <div class="choose_option">
+                                <h3>You won the game !</h3>
+                                <div class="button" id="restart" onclick="level5()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
+                clearInterval(start)
+                clearInterval(moveInt)
+                clearInterval(movingBarricade)
+            }
+        }, 1)
+    }
+
+    // bắt đầu game chế đọ 2 người
     function restart() {
         let ball = randomNewmBall();
         move();
@@ -592,12 +686,12 @@
                 if (p1_score === 5 || p2_score === 5) {
                     $(".game").css('opacity', '0.7')
                     $(".container.main").append(`
-                        <div class="choose_option">
-                            <h3>Player ` + (p1_score === 5 ? `1` : `2`) + ` Won !</h3>
-                            <div class="button" id="restart" onclick="mode0()"><p>Restart</p></div>
-                            <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
-                        </div>
-                    `)
+                            <div class="choose_option">
+                                <h3>Player ` + (p1_score === 5 ? `1` : `2`) + ` Won !</h3>
+                                <div class="button" id="restart" onclick="mode0()"><p>Restart</p></div>
+                                <div class="button" id="main_menu" onclick="go_back()"><p>Main menu</p></div>
+                            </div>
+                        `)
                     clearInterval(start)
                     clearInterval(moveInt)
                 } else {
@@ -609,16 +703,15 @@
 
     // chọn mode 1 thì hiển thị các level để chọn
     function mode1() {
-        $(".game").empty().append(`<div class="choose">
-            <h4>Choose Level</h4>
-            <div class="button" id="level0" onclick="choose_level(this.id)"><p>Default</p></div>
-            <div class="button" id="level1" onclick="choose_level(this.id)"><p>Easy</p></div>
-            <div class="button" id="level2" onclick="choose_level(this.id)"><p>Medium</p></div>
-            <div class="button" id="level3" onclick="choose_level(this.id)"><p>Hard</p></div>
-            <div class="button" id="level4" onclick="choose_level(this.id)"><p>Terrible</p></div>
-            <div class="button" id="level5" onclick="choose_level(this.id)"><p>Danger</p></div>
-            <div class="button" id="go-back" onclick="go_back()"><p>Go back</p></div>
-        </div>`);
+        $(".choose").empty().append(`
+                <h4>Choose Level</h4>
+                <div class="button" id="level0" onclick="choose_level(this.id)"><p>Default</p></div>
+                <div class="button" id="level1" onclick="choose_level(this.id)"><p>Easy</p></div>
+                <div class="button" id="level2" onclick="choose_level(this.id)"><p>Medium</p></div>
+                <div class="button" id="level3" onclick="choose_level(this.id)"><p>Hard</p></div>
+                <div class="button" id="level4" onclick="choose_level(this.id)"><p>Terrible</p></div>
+                <div class="button" id="level5" onclick="choose_level(this.id)"><p>Danger</p></div>
+                <div class="button" id="go-back" onclick="go_back()"><p>Go back</p></div>`);
     }
 
     // generate giao diện khi chọn mode0
@@ -626,13 +719,13 @@
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
         $(".game").empty().append(`
-            <div id="p1-paddle"></div>
-            <div id="ball"></div>
-            <div id="line-break"></div>
-            <div id="p2-paddle"></div>
-            <div class="score p1-score">0</div>
-            <div class="score p2-score">0</div>
-        `);
+                <div id="p1-paddle"></div>
+                <div id="ball"></div>
+                <div id="line-break"></div>
+                <div id="p2-paddle"></div>
+                <div class="score p1-score">0</div>
+                <div class="score p2-score">0</div>
+            `);
         restart();
     }
 
@@ -641,11 +734,15 @@
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
         $(".game").empty().append(`
-            <div class="p1_life">Life: <a>3</a></div>
-            <div id="p1-paddle"></div>
-            <div id="ball"></div>`
+                <div class="p1_life">
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                </div>
+                <div id="p1-paddle"></div>
+                <div id="ball"></div>`
         );
-        const noOfBricksPerRow = 5;
+        const noOfBricksPerRow = 4;
         const noOfRows = 10;
         let bricks;
         const totalBricks = noOfRows * noOfBricksPerRow;
@@ -653,6 +750,7 @@
         let cell;
         let c = $('<div>').addClass('row_container');
         let img;
+        // vẽ các brick
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
             for (let j = 0; j < noOfBricksPerRow; j++) {
@@ -664,6 +762,7 @@
             c.append(r);
         }
         $('.game').append(c);
+        // margin các brick qua bên phải
         $(".row .brick:first-child").css("margin", "1px 1px 1px " + (screenSize.width - 42 * noOfBricksPerRow) + "px")
         gameplay1(noOfBricksPerRow, noOfRows);
     }
@@ -673,13 +772,17 @@
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
         $(".game").empty().append(`
-            <div class="p1_life">Life: <a>3</a></div>
-            <div id="p1-paddle"></div>
-            <div id="barricade-1" class="barricade"></div>
-            <div id="barricade-2" class="barricade"></div>
-            <div id="ball"></div>`
+                  <div class="p1_life">
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                </div>
+                <div id="p1-paddle"></div>
+                <div id="barricade-1" class="barricade"></div>
+                <div id="barricade-2" class="barricade"></div>
+                <div id="ball"></div>`
         );
-        const noOfBricksPerRow = 5;
+        const noOfBricksPerRow = 4;
         const noOfRows = 10;
         let bricks;
         const totalBricks = noOfRows * noOfBricksPerRow;
@@ -687,6 +790,7 @@
         let cell;
         let c = $('<div>').addClass('row_container');
         let img;
+        // vẽ các brick
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
             for (let j = 0; j < noOfBricksPerRow; j++) {
@@ -698,6 +802,7 @@
             c.append(r);
         }
         $('.game').append(c);
+        // margin các brick qua bên phải
         $(".row .brick:first-child").css("margin", "1px 1px 1px " + (screenSize.width - 42 * noOfBricksPerRow) + "px")
         gameplay2(noOfBricksPerRow, noOfRows);
     }
@@ -707,13 +812,17 @@
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
         $(".game").empty().append(`
-            <div class="p1_life">Life: <a>3</a></div>
-            <div id="p1-paddle"></div>
-            <div id="barricade-1" class="barricade"></div>
-            <div id="barricade-2" class="barricade"></div>
-            <div id="ball"></div>`
+                  <div class="p1_life">
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                </div>
+                <div id="p1-paddle"></div>
+                <div id="barricade-1" class="barricade"></div>
+                <div id="barricade-2" class="barricade"></div>
+                <div id="ball"></div>`
         );
-        const noOfBricksPerRow = 5;
+        const noOfBricksPerRow = 4;
         const noOfRows = 10;
         let bricks;
         const totalBricks = noOfRows * noOfBricksPerRow;
@@ -721,6 +830,7 @@
         let cell;
         let c = $('<div>').addClass('row_container');
         let img;
+        // vẽ các brick
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
             for (let j = 0; j < noOfBricksPerRow; j++) {
@@ -732,6 +842,7 @@
             c.append(r);
         }
         $('.game').append(c);
+        // margin các brick qua bên phải
         $(".row .brick:first-child").css("margin", "1px 1px 1px " + (screenSize.width - 42 * noOfBricksPerRow) + "px")
         gameplay3(noOfBricksPerRow, noOfRows);
     }
@@ -741,13 +852,17 @@
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
         $(".game").empty().append(`
-            <div class="p1_life">Life: <a>2</a></div>
-            <div id="p1-paddle"></div>
-            <div id="barricade-1" class="barricade"></div>
-            <div id="barricade-2" class="barricade"></div>
-            <div id="ball"></div>
-        `);
-        const noOfBricksPerRow = 5;
+                  <div class="p1_life">
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                </div>
+                <div id="p1-paddle"></div>
+                <div id="barricade-1" class="barricade"></div>
+                <div id="barricade-2" class="barricade"></div>
+                <div id="ball"></div>
+            `);
+        const noOfBricksPerRow = 4;
         const noOfRows = 10;
         let bricks;
         const totalBricks = noOfRows * noOfBricksPerRow;
@@ -755,11 +870,14 @@
         let cell;
         let c = $('<div>').addClass('row_container');
         let img;
+        // vẽ brick
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
             for (let j = -1; j < noOfBricksPerRow; j++) {
+                // vẽ vật chắn tại vị trí gạch đầu tiên
                 if (j === -1) {
-                    if (i !== 4 && i !== 5) {
+                    // vẽ ở cột đầu tiên, né các ô 3 4 5 6, nếu là 3 4 5 6 thì bỏ trắng, làm thành khoảng trống để bóng vào trong
+                    if (i !== 4 && i !== 5 && i !== 3 && i !== 6) {
                         cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                         img = $(`<img src="img/Iron_Block.png"/>`)
                         cell.append(img)
@@ -786,13 +904,17 @@
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
         $(".game").empty().append(`
-            <div class="p1_life">Life: <a>2</a></div>
-            <div id="p1-paddle"></div>
-            <div id="barricade-1" class="barricade"></div>
-            <div id="barricade-2" class="barricade"></div>
-            <div id="ball"></div>
-        `);
-        const noOfBricksPerRow = 5;
+                 <div class="p1_life">
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                </div>
+                <div id="p1-paddle"></div>
+                <div id="barricade-1" class="barricade"></div>
+                <div id="barricade-2" class="barricade"></div>
+                <div id="ball"></div>
+            `);
+        const noOfBricksPerRow = 4;
         const noOfRows = 10;
         let bricks;
         const totalBricks = noOfRows * noOfBricksPerRow;
@@ -802,9 +924,10 @@
         let img;
         for (let i = 0; i < noOfRows; i++) {
             r = $('<div>').addClass('row');
-            for (let j = -2; j < noOfBricksPerRow; j++) {
-                if (j === -2) {
-                    if (i > 1 && i < 8) {
+            for (let j = -1; j < noOfBricksPerRow; j++) {
+                if (j === -1) {
+                    // tương tự như trên, ở đây khi vẽ vật chắn thì sẽ bỏ ô 0 đến 2, và ô 7 trở đi
+                    if (i > 2 && i < 7) {
                         cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                         img = $(`<img src="img/Iron_Block.png"/>`)
                         cell.append(img)
@@ -812,6 +935,63 @@
                         cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                         cell.css("opacity", "0")
                     }
+                } else {
+                    // thêm điều kiện cho level ở đây, gạch phải bị phá 2 lần, thêm class not-break-yet
+                    cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j + " not-break-yet");
+                    img = $(`<img src="img/203878.png"/>`)
+                    cell.append(img)
+                }
+                r.append(cell);
+            }
+            c.append(r);
+        }
+        $('.game').append(c);
+        $(".row .brick:first-child").css("margin", "1px 1px 1px " + (screenSize.width - 42 * (noOfBricksPerRow + 1)) + "px")
+        gameplay5(noOfBricksPerRow, noOfRows);
+    }
+
+    // gameplay cho chế độ phá gạch với level 5
+    function level5() {
+        $(".container.main .choose_option").remove()
+        $(".game").css('opacity', '1')
+        $(".game").empty().append(`
+                 <div class="p1_life">
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                    <div class="heart"></div>
+                </div>
+                <div id="p1-paddle"></div>
+                <div id="barricade-1" class="barricade"></div>
+                <div id="barricade-2" class="barricade"></div>
+                <div id="teleport1" class="teleport"></div>
+                <div id="teleport2" class="teleport"></div>
+                <div id="ball"></div>
+            `);
+        const noOfBricksPerRow = 5;
+        const noOfRows = 10;
+        let bricks;
+        const totalBricks = noOfRows * noOfBricksPerRow;
+        let r;
+        let cell;
+        let c = $('<div>').addClass('row_container');
+        let img;
+        // tương tự vẽ gạch ở level 4
+        for (let i = 0; i < noOfRows; i++) {
+            r = $('<div>').addClass('row');
+            for (let j = -3; j < noOfBricksPerRow; j++) {
+                if (j === -3) {
+                    if (i > 2 && i < 7) {
+                        cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                        img = $(`<img src="img/Iron_Block.png"/>`)
+                        cell.append(img)
+                    } else {
+                        cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                        cell.css("opacity", "0")
+                    }
+                } else if (j === -2 || j === -1 || j === 0) {
+                    // thêm khoảng trắng ở cột -2 -1 và 0
+                    cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                    cell.css("opacity", "0")
                 } else {
                     cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j + " not-break-yet");
                     img = $(`<img src="img/203878.png"/>`)
@@ -822,10 +1002,11 @@
             c.append(r);
         }
         $('.game').append(c);
-        $(".row .brick:first-child").css("margin", "1px 1px 1px " + (screenSize.width - 42 * (noOfBricksPerRow + 2)) + "px")
-        gameplay5(noOfBricksPerRow, noOfRows);
+        $(".row .brick:first-child").css("margin", "1px 1px 1px " + (screenSize.width - 42 * (noOfBricksPerRow + 3)) + "px")
+        gameplay6(noOfBricksPerRow, noOfRows);
     }
 
+    // Chọn level
     function choose_level(id) {
         switch (id) {
             case "level0":
@@ -849,6 +1030,7 @@
         }
     }
 
+    // Start Sound effect function
     function pongWood() {
         let pongWood = new Audio("sound/pongWood.mp3")
         pongWood.volume = 0.2
@@ -879,8 +1061,12 @@
         pongSteel.play()
     }
 
-    // tạo ball
+    // End Sound effect function
+    // Class Ball, với các hàm draw
+
+    // đối tượng ball
     class Ball {
+        // gồm 5 tham số, vị trí bắt đầu x y, dx dy là gia tốc theo hướng x y, size là kích thước quả bóng
         constructor(x, y, dx, dy, size) {
             this.x = x;
             this.y = y;
@@ -889,6 +1075,7 @@
             this.size = size;
         }
 
+        // cập nhật vị trí mới cho bóng
         updatePosition() {
             this.x += this.dx
             this.y += this.dy
@@ -896,6 +1083,7 @@
             $('#ball').css('top', this.y + "px");
         }
 
+        // Kiểm tra va chạm của paddle trong chế độ phá gạch
         checkCollisionBrickMode(paddleY) {
             if (paddleY <= this.y + this.size && this.y <= paddleY + 100
                 && this.x <= 10) {
@@ -917,36 +1105,91 @@
             }
         }
 
+        // Kiểm tra va chạm với cổng teleport
+        collisionTeleport() {
+            let width = 20
+            let height = 100
+            let teleport1X = parseInt($("#teleport1").css('left').substring(0, $("#teleport1").css('left').indexOf('px')));
+            let teleport2X = parseInt($("#teleport2").css('left').substring(0, $("#teleport2").css('left').indexOf('px')));
+            let teleport1Y = parseInt($("#teleport1").css('top').substring(0, $("#teleport1").css('top').indexOf('px')));
+            let teleport2Y = parseInt($("#teleport2").css('top').substring(0, $("#teleport2").css('top').indexOf('px')));
+
+            // nếu vị trí của bóng nằm ở 1 trên 4 cạnh của vật chắn thứ 1 thì kiểm tra sự kiện
+            if (this.x + this.size >= teleport1X && this.x <= teleport1X + width
+                && this.y + this.size >= teleport1Y && this.y <= teleport1Y + height) {
+                const ballCenterX = this.x + this.size / 2;
+                const ballCenterY = this.y + this.size / 2;
+                // nếu bóng có vị trí nằm bên trái vật chắn, sẽ tele bóng qua bên phải của vật chắn thứ 2
+                if (ballCenterX < teleport1X) {
+                    this.x = teleport2X + width + 1
+                    this.y = teleport2Y + Math.abs(teleport1Y - this.y) + 1
+                } else if (ballCenterX > teleport1X + width) {
+                    // nếu bóng có vị trí nằm bên phải vật chắn, sẽ tele bóng qua bên trái của vật chắn thứ 2
+                    this.x = teleport2X - this.size - 1
+                    this.y = teleport2Y + Math.abs(teleport1Y - this.y) - 1
+                }
+                // nếu bóng có vị trí nằm bên trên vật chắn, sẽ tele bóng qua bên dưới của vật chắn thứ 2
+                if (ballCenterY < teleport1Y) {
+                    this.x = teleport2X + Math.abs(teleport1X - this.x) + 1
+                    this.y = teleport2Y + height + 1
+                } else if (ballCenterY > teleport1Y + height) {
+                    // nếu bóng có vị trí nằm bên dưới vật chắn, sẽ tele bóng qua bên trên của vật chắn thứ 2
+                    this.x = teleport2X + Math.abs(teleport1X - this.x) + 1
+                    this.y = teleport2Y - this.size - 1
+                }
+            }
+            // tương tự giải thích cho vật chắn thứ 2, khi va chạm quả bóng sẽ tele lên vật chắn thứ 1
+            if (this.x + this.size >= teleport2X && this.x <= teleport2X + width
+                && this.y + this.size >= teleport2Y && this.y <= teleport2Y + height) {
+                const ballCenterX = this.x + this.size / 2;
+                const ballCenterY = this.y + this.size / 2;
+                if (ballCenterX < teleport2X) {
+                    this.x = teleport1X + width
+                    this.y = teleport1Y + Math.abs(teleport2Y - this.y)
+                } else if (ballCenterX > teleport2X + width) {
+                    this.x = teleport1X - this.size
+                    this.y = teleport1Y + Math.abs(teleport2Y - this.y)
+                }
+            }
+        }
+
         // Kiểm tra va chạm với vật chắn có hình chữ nhật
         collisionBarricade(barricadeX, barricadeY, width, height) {
+            // nếu vị trí của bóng nằm ở 1 trên 4 cạnh của vật chắn thì kiểm tra sự kiện
             if (this.x + this.size >= barricadeX && this.x <= barricadeX + width
                 && this.y + this.size >= barricadeY && this.y <= barricadeY + height) {
                 const ballCenterX = this.x + this.size / 2;
                 const ballCenterY = this.y + this.size / 2;
                 if (ballCenterX < barricadeX) {
+                    // nếu bóng có vị trí nằm bên trái vật chắn, sẽ cập nhật dx thành âm, do x đang tăng
                     this.dx = -Math.abs(this.dx)
                     pongWood()
                 } else if (ballCenterX > barricadeX + width) {
+                    // nếu bóng có vị trí nằm bên phải vật chắn, sẽ cập nhật dx thành dương, do x đang giảm
                     this.dx = Math.abs(this.dx)
                     pongWood()
                 }
                 if (ballCenterY < barricadeY) {
+                    // nếu bóng có vị trí nằm bên trên vật chắn, sẽ cập nhật dy thành âm, do dy đang tăng
                     this.dy = -Math.abs(this.dy)
                     pongWood()
                 } else if (ballCenterY > barricadeY + height) {
+                    // nếu bóng có vị trí nằm bên dưới vật chắn, sẽ cập nhật dy thành dương, do dy đang giảm
                     this.dy = Math.abs(this.dy)
                     pongWood()
                 }
             }
         }
 
-        // Kiểm tra va chạm với gạch cho level 1 và 2
+        // Kiểm tra va chạm với gạch cho level 1 và 2, giống như kiểm tra với vật chắn ở trên. Nếu va chạm thì thêm class active cho gạch để gạch mất
         collisionWith1TimeBrick(brickPerRow, row, rowPerBrickStart) {
             for (let i = 0; i < row; i++) {
                 for (let j = rowPerBrickStart; j < brickPerRow; j++) {
                     let brick = $('.brick' + '-' + i + '-' + j);
                     let y_brick = brick.position().top;
+                    // do ban đầu margin gạch qua trái, phải lấy vị trí ban đầu cho viên gạch ở vị trí đầu tiên của mỗi hàng
                     let x_brick = (j === rowPerBrickStart) ? (screenSize.width - 42 * (brickPerRow + Math.abs(rowPerBrickStart))) : brick.position().left;
+                    // Nếu gạch chưa có class active thì kiểm tra sự kiện
                     if (!brick.hasClass("active")) {
                         if (this.x + this.size >= x_brick && this.x <= x_brick + 42
                             && this.y + this.size >= y_brick && this.y <= y_brick + 60) {
@@ -976,7 +1219,7 @@
             }
         }
 
-        // Kiểm tra va chạm với gạch cho level 3 và 4
+        // Kiểm tra va chạm với gạch cho level 3 4 và 5, giống với ở trên, nhưng có thêm cập nhật gạch vỡ
         collisionWith2TimeBrick(brickPerRow, row, rowPerBrickStart) {
             for (let i = 0; i < row; i++) {
                 for (let j = rowPerBrickStart; j < brickPerRow; j++) {
@@ -1017,7 +1260,7 @@
                                 this.dy = Math.abs(this.dy)
                                 if (j !== rowPerBrickStart) {
                                     addCracked(brick)
-                                    lpongBrick()
+                                    pongBrick()
                                 } else if (j === rowPerBrickStart && brick.css("opacity") !== "0") {
                                     pongSteel()
                                 }
@@ -1172,18 +1415,41 @@
             this.collisionBarricade(barricade2X, barricade2Y, 20, 200)
 
             this.collisionScreen();
-            this.collisionWith2TimeBrick(brickPerRow, row, -2)
+            this.collisionWith2TimeBrick(brickPerRow, row, -1)
+            this.updatePosition()
+        }
+
+        // hàm vẽ chế độ phá gạch level 5
+        drawMode6(paddle1, brickPerRow, row, numb) {
+            let paddle1Y = parseInt(paddle1.css('top').substring(0, paddle1.css('top').indexOf('px')));
+            let barricade1X = parseInt($("#barricade-1").css('left').substring(0, $("#barricade-1").css('left').indexOf('px')));
+            let barricade2X = parseInt($("#barricade-2").css('left').substring(0, $("#barricade-2").css('left').indexOf('px')));
+            let barricade1Y = parseInt($("#barricade-1").css('top').substring(0, $("#barricade-1").css('top').indexOf('px')));
+            let barricade2Y = parseInt($("#barricade-2").css('top').substring(0, $("#barricade-2").css('top').indexOf('px')));
+
+            // Kiểm tra khi va chạm với thanh chắn trái
+            this.checkCollisionBrickMode(paddle1Y)
+
+            this.collisionBarricade(barricade1X, barricade1Y, 20, 200)
+            this.collisionBarricade(barricade2X, barricade2Y, 20, 200)
+
+            this.collisionTeleport()
+
+            this.collisionScreen();
+            this.collisionWith2TimeBrick(brickPerRow, row, -3)
             this.updatePosition()
         }
     }
 
     // Khi va chạm, thì phải va chạm thêm 1 lần nữa thì mới phá được gạch, cho level 4 và 5
     function addCracked(brick) {
+        // nếu chưa va chạm lần đầu, thì cập nhật xóa class đồng thời đổi lại ảnh để hiển thị trạng thái đã vỡ lần 1
         if (brick.hasClass("not-break-yet")) {
             let img = $(`<img src="img/cracked.jpg"/>`)
             brick.empty().append(img)
             brick.removeClass("not-break-yet")
         } else {
+            // nếu đã vỡ lần 1 thì khi va chạm lần 2 sẽ thêm class active để gạch biến mất
             brick.addClass("active")
         }
     }
