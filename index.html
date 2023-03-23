@@ -278,7 +278,7 @@
     }
 
     // di chuyển 2 thanh paddle
-    function move() {
+    function move(ball) {
         $('.game').unbind('mousemove');
         let speed1 = 0;
         let speed2 = 0;
@@ -294,12 +294,6 @@
                 case 83:
                     speed1 = 4
                     break;
-                case 38:
-                    speed2 = -4
-                    break;
-                case 40:
-                    speed2 = 4
-                    break;
             }
         }
 
@@ -307,20 +301,31 @@
         function keyUp(e) {
             if (e.keyCode === 87 || e.keyCode === 83)
                 speed1 = 0
-            if (e.keyCode === 38 || e.keyCode === 40)
-                speed2 = 0
         }
 
         // gán lặp để vẽ khi các paddle thay đổi vị trí
         moveInt = setInterval(function () {
             let pos1 = parseInt($("#p1-paddle").css("top").substring(0, $("#p1-paddle").css("top").indexOf('px')));
+            // AI di chuyển
             let pos2 = parseInt($("#p2-paddle").css("top").substring(0, $("#p2-paddle").css("top").indexOf('px')));
+            let paddle_center = pos2 + 100 / 2;
+
+            for (let i = 100, j = 4; i >= 25; i -= 25, j /= 1.5) {
+                if (paddle_center < ball.y - i) {
+                    speed2 = j;
+                    break;
+                } else if (paddle_center > ball.y + i) {
+                    speed2 = -j;
+                    break;
+                }
+            }
+
             if (pos1 + speed1 > 0 && pos1 + speed1 < 498)
                 pos1 += speed1
             if (pos2 + speed2 > 0 && pos2 + speed2 < 498)
                 pos2 += speed2
-            $("#p1-paddle").css('top', pos1 + 'px');
             $("#p2-paddle").css('top', pos2 + 'px');
+            $("#p1-paddle").css('top', pos1 + 'px');
         }, 1)
     }
 
@@ -1071,7 +1076,7 @@
     // bắt đầu game chế độ 2 người
     function restart() {
         let ball = randomNewmBall();
-        move();
+        move(ball);
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball.draw2Player($("#p1-paddle"), $("#p2-paddle"))
@@ -1099,6 +1104,8 @@
                     clearInterval(moveInt)
                 } else {
                     ball = randomNewmBall();
+                    clearInterval(moveInt)
+                    move(ball)
                 }
             }
         }, 1)
@@ -1144,7 +1151,7 @@
                         }
                     }
                 }, 1)
-                move()
+                move(ball)
                 $(".pause").removeClass("start");
             }
         })
