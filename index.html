@@ -334,7 +334,7 @@
     function randomNewBallMode1() {
         let startAngle;
         startAngle = getBallComingAngle(Math.random() * 30 + 30)
-        return new Ball(screenSize.width / 5, screenSize.height / 2, startAngle[0] * 5, startAngle[1] * 5, 20)
+        return new Ball(screenSize.width / 5, screenSize.height / 2, startAngle[0] * 3, startAngle[1] * 3, 20)
     }
 
     // tạo ball với góc phát ngẫu nhiên (game play 2 người)
@@ -549,7 +549,7 @@
             barricadeX2 += dx2;
             $("#barricade-1").css('left', barricadeX1)
             $("#barricade-2").css('left', barricadeX2)
-        }, 1)
+        }, 20)
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball.drawMode3($("#p1-paddle"), x, y)
@@ -680,7 +680,7 @@
             $("#barricade-2").css('left', barricadeX2)
             $("#barricade-1").css('top', barricadeY1)
             $("#barricade-2").css('top', barricadeY2)
-        }, 1)
+        }, 20)
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball1.drawMode4($("#p1-paddle"), x, y, 1)
@@ -819,7 +819,7 @@
             $("#barricade-2").css('left', barricadeX2)
             $("#barricade-1").css('top', barricadeY1)
             $("#barricade-2").css('top', barricadeY2)
-        }, 1)
+        }, 20)
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
             ball1.drawMode5($("#p1-paddle"), x, y, 1)
@@ -957,7 +957,7 @@
             $("#barricade-2").css('left', barricadeX2)
             $("#barricade-1").css('top', barricadeY1)
             $("#barricade-2").css('top', barricadeY2)
-        }, 1)
+        }, 30)
         mouseMove()
         // tạo sự kiện lặp để vẽ quả bóng mỗi khi thay đổi vị trí
         start = setInterval(function () {
@@ -1068,7 +1068,7 @@
         })
     }
 
-    // bắt đầu game chế đọ 2 người
+    // bắt đầu game chế độ 2 người
     function restart() {
         let ball = randomNewmBall();
         move();
@@ -1429,7 +1429,7 @@
         $(".container.main .choose_option").remove()
         $(".game").css('opacity', '1')
         $(".game").empty().append(`
-                 <div class="p1_life">
+                <div class="p1_life">
                     <div class="heart"></div>
                     <div class="heart"></div>
                     <div class="heart"></div>
