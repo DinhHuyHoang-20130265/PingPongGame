@@ -1362,6 +1362,9 @@
                         cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                         cell.css("opacity", "0")
                     }
+                } else if (i !== 4 && i !== 5 && i !== 3 && i !== 6) {
+                    cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                    cell.css("opacity", "0")
                 } else {
                     cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                     img = $(`<img src="img/203878.png"/>`)
@@ -1416,6 +1419,9 @@
                         cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                         cell.css("opacity", "0")
                     }
+                } else if (i !== 4 && i !== 5 && i !== 3 && i !== 6) {
+                    cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                    cell.css("opacity", "0")
                 } else {
                     // thêm điều kiện cho level ở đây, gạch phải bị phá 2 lần, thêm class not-break-yet
                     cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j + " not-break-yet");
@@ -1473,14 +1479,19 @@
                         cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                         cell.css("opacity", "0")
                     }
-                } else if (j === -2 || j === -1 || j === 0) {
+                } else if (j > -3 && j < 1) {
                     // thêm khoảng trắng ở cột -2 -1 và 0
                     cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
                     cell.css("opacity", "0")
                 } else {
-                    cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j + " not-break-yet");
-                    img = $(`<img src="img/203878.png"/>`)
-                    cell.append(img)
+                    if (i > 2 && i < 7) {
+                        cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j);
+                        cell.css("opacity", "0")
+                    } else {
+                        cell = $('<div>').addClass('brick brick' + '-' + i + '-' + j + " not-break-yet");
+                        img = $(`<img src="img/203878.png"/>`)
+                        cell.append(img)
+                    }
                 }
                 r.append(cell);
             }
